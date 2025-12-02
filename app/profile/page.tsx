@@ -63,7 +63,7 @@ export default function ProfilePage() {
 
       const userId = session.user.id;
 
-      const [profileRes, jobsRes, listingsRes, reviewsRes] = await Promise.all([
+      const [profileRes, jobsRes, listingsRes, reviewsRes, postsRes] = await Promise.all([
         supabase
           .from('profiles')
           .select('id, email, full_name, university, major, year, avatar_url, bio, rating, total_ratings, created_at')
