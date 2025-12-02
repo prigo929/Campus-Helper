@@ -84,6 +84,16 @@ const demos = [
     year: 'Senior',
     bio: 'Demo from Harvard for jobs and posts.',
   },
+  {
+    email: 'admin@campushelper.test',
+    password: 'AdminDemo1!',
+    full_name: 'Campus Admin',
+    university: 'Campus Helper',
+    major: 'Platform Ops',
+    year: '—',
+    bio: 'Platform admin account for moderation and cleanup.',
+    role: 'admin',
+  },
 ];
 
 const jobs = [
@@ -257,6 +267,7 @@ for (const demo of demos) {
       university: demo.university,
       major: demo.major,
       year: demo.year,
+      role: demo.role || 'user',
     },
   });
 
