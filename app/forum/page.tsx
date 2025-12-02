@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { Search, Plus, MessageSquare, Eye, TrendingUp, Loader2 } from 'lucide-react';
@@ -251,58 +252,53 @@ export default function ForumPage() {
 
               <div className="grid gap-4">
                 {filteredPosts.map((post, index) => (
-                  <Card
-                    key={post.id}
-                    className="hover:shadow-lg transition-all border-2 hover:border-[#d4af37] bg-white/90 backdrop-blur animate-fade-in-up"
-                    style={{ animationDelay: `${index * 0.05}s` }}
-                  >
-                    <CardHeader className="pb-3">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-2">
-                            <h3 className="text-lg font-bold text-[#1e3a5f]">{post.title}</h3>
-                            {post.trending && (
-                              <Badge className="bg-[#d4af37] text-[#1e3a5f]">
-                                <TrendingUp className="w-3 h-3 mr-1" />
-                                Trending
-                              </Badge>
-                            )}
+                  <Link href={`/forum/post?id=${post.id}`} key={post.id}>
+                    <Card
+                      className="hover:shadow-lg transition-all border-2 hover:border-[#d4af37] bg-white/90 backdrop-blur animate-fade-in-up"
+                      style={{ animationDelay: `${index * 0.05}s` }}
+                    >
+                      <CardHeader className="pb-3">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-2">
+                              <h3 className="text-lg font-bold text-[#1e3a5f]">{post.title}</h3>
+                              {post.trending && (
+                                <Badge className="bg-[#d4af37] text-[#1e3a5f]">
+                                  <TrendingUp className="w-3 h-3 mr-1" />
+                                  Trending
+                                </Badge>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-3 text-sm text-gray-600">
+                              <span className="font-medium">{post.user_name || 'Campus Helper user'}</span>
+                              {post.user_rating && <span className="text-[#d4af37]">★ {post.user_rating}</span>}
+                              <span className="text-gray-400">•</span>
+                              <span>{post.posted ? formatDate(post.posted) : formatDate(post.created_at)}</span>
+                            </div>
                           </div>
-                        <div className="flex items-center gap-3 text-sm text-gray-600">
-                          <span className="font-medium">{post.user_name || 'Campus Helper user'}</span>
-                          {post.user_rating && <span className="text-[#d4af37]">★ {post.user_rating}</span>}
-                          <span className="text-gray-400">•</span>
-                          <span>{post.posted ? formatDate(post.posted) : formatDate(post.created_at)}</span>
+                          <Badge className={getCategoryColor(post.category)}>
+                            {post.category}
+                          </Badge>
                         </div>
-                        </div>
-                        <Badge className={getCategoryColor(post.category)}>
-                          {post.category}
-                        </Badge>
-                      </div>
-                    </CardHeader>
+                      </CardHeader>
 
-                    <CardContent>
-                      <p className="text-gray-700 mb-4">{post.content}</p>
+                      <CardContent>
+                        <p className="text-gray-700 mb-4">{post.content}</p>
 
-                      <div className="flex items-center gap-6 text-sm text-gray-600">
-                        <div className="flex items-center">
-                          <Eye className="w-4 h-4 mr-1 text-[#d4af37]" />
-                          <span>{post.views ?? 0} views</span>
+                        <div className="flex items-center gap-6 text-sm text-gray-600">
+                          <div className="flex items-center">
+                            <Eye className="w-4 h-4 mr-1 text-[#d4af37]" />
+                            <span>{post.views ?? 0} views</span>
+                          </div>
+                          <div className="flex items-center">
+                            <MessageSquare className="w-4 h-4 mr-1 text-[#d4af37]" />
+                            <span>{post.comments ?? 0} comments</span>
+                          </div>
+                          <span className="ml-auto text-[#1e3a5f] group-hover:text-[#d4af37]">View Discussion →</span>
                         </div>
-                        <div className="flex items-center">
-                          <MessageSquare className="w-4 h-4 mr-1 text-[#d4af37]" />
-                          <span>{post.comments ?? 0} comments</span>
-                        </div>
-                        <Button
-                          variant="ghost"
-                          className="ml-auto text-[#1e3a5f] hover:text-[#d4af37] hover:bg-transparent"
-                          onClick={() => router.push(`/forum/post?id=${post.id}`)}
-                        >
-                          View Discussion →
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
+                      </CardContent>
+                    </Card>
+                  </Link>
                 ))}
               </div>
 

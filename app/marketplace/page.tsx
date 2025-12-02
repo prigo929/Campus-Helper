@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { Search, Plus, BookOpen, FileText, Microscope, Laptop, Loader2 } from 'lucide-react';
@@ -247,51 +248,47 @@ export default function MarketplacePage() {
               const categoryKey = (item.category_label || item.category || 'Other') as keyof typeof categoryIcons;
               const IconComponent = categoryIcons[categoryKey] || Microscope;
               return (
-                <Card
-                  key={item.id}
-                  className="hover:shadow-lg transition-all border-2 hover:border-[#d4af37] flex flex-col bg-white/90 backdrop-blur animate-fade-in-up"
-                  style={{ animationDelay: `${index * 0.05}s` }}
-                >
-                  <CardContent className="p-6 flex-1">
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="w-12 h-12 bg-[#f0f0f0] rounded-lg flex items-center justify-center">
-                        <IconComponent className="w-6 h-6 text-[#1e3a5f]" />
+                <Link href={`/marketplace/detail?id=${item.id}`} key={item.id}>
+                  <Card
+                    className="hover:shadow-lg transition-all border-2 hover:border-[#d4af37] flex flex-col bg-white/90 backdrop-blur animate-fade-in-up"
+                    style={{ animationDelay: `${index * 0.05}s` }}
+                  >
+                    <CardContent className="p-6 flex-1">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="w-12 h-12 bg-[#f0f0f0] rounded-lg flex items-center justify-center">
+                          <IconComponent className="w-6 h-6 text-[#1e3a5f]" />
+                        </div>
+                        <Badge className="bg-[#d4af37] text-[#1e3a5f] hover:bg-[#c19b2e]">
+                          {item.category_label || item.category}
+                        </Badge>
                       </div>
-                      <Badge className="bg-[#d4af37] text-[#1e3a5f] hover:bg-[#c19b2e]">
-                        {item.category_label || item.category}
-                      </Badge>
-                    </div>
 
-                    <h3 className="text-lg font-bold text-[#1e3a5f] mb-2">{item.title}</h3>
-                    <p className="text-sm text-gray-600 mb-4 line-clamp-2">{item.description}</p>
+                      <h3 className="text-lg font-bold text-[#1e3a5f] mb-2">{item.title}</h3>
+                      <p className="text-sm text-gray-600 mb-4 line-clamp-2">{item.description}</p>
 
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="text-2xl font-bold text-[#1e3a5f]">
-                        ${item.price}
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="text-2xl font-bold text-[#1e3a5f]">
+                          ${item.price}
+                        </div>
+                        <Badge className={getConditionColor(item.condition)}>
+                          {item.condition.replace('_', ' ')}
+                        </Badge>
                       </div>
-                      <Badge className={getConditionColor(item.condition)}>
-                        {item.condition.replace('_', ' ')}
-                      </Badge>
-                    </div>
 
-                    <div className="flex items-center text-sm text-gray-600">
-                      <span className="font-medium">{item.seller || 'Campus Helper user'}</span>
-                      {item.seller_rating && <span className="ml-2 text-[#d4af37]">★ {item.seller_rating}</span>}
-                      <span className="ml-auto text-gray-400">
-                        {item.posted ? formatDate(item.posted) : formatDate(item.created_at) || 'Recently listed'}
-                      </span>
-                    </div>
-                  </CardContent>
+                      <div className="flex items-center text-sm text-gray-600">
+                        <span className="font-medium">{item.seller || 'Campus Helper user'}</span>
+                        {item.seller_rating && <span className="ml-2 text-[#d4af37]">★ {item.seller_rating}</span>}
+                        <span className="ml-auto text-gray-400">
+                          {item.posted ? formatDate(item.posted) : formatDate(item.created_at) || 'Recently listed'}
+                        </span>
+                      </div>
+                    </CardContent>
 
-                  <CardFooter className="p-6 pt-0">
-                    <Button
-                      className="w-full bg-[#1e3a5f] hover:bg-[#2a4a6f] text-white"
-                      onClick={() => router.push(`/marketplace/detail?id=${item.id}`)}
-                    >
-                      View Details
-                    </Button>
-                  </CardFooter>
-                </Card>
+                    <CardFooter className="p-6 pt-0">
+                      <span className="w-full text-center text-[#1e3a5f] group-hover:text-[#d4af37]">View Details</span>
+                    </CardFooter>
+                  </Card>
+                </Link>
               );
             })}
           </div>

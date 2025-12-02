@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { Search, MapPin, DollarSign, Clock, Plus, Loader2 } from 'lucide-react';
@@ -204,68 +205,63 @@ export default function JobsPage() {
 
           <div className="grid gap-6">
             {filteredJobs.map((job, index) => (
-              <Card
-                key={job.id}
-                className="hover:shadow-lg transition-shadow border-2 hover:border-[#d4af37] bg-white/90 backdrop-blur animate-fade-in-up"
-                style={{ animationDelay: `${index * 0.05}s` }}
-              >
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <CardTitle className="text-xl text-[#1e3a5f] mb-2">{job.title}</CardTitle>
-                      <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
-                        <div className="flex items-center">
-                          <span className="font-medium">{job.user_name || 'Campus Helper user'}</span>
-                          {job.user_rating && <span className="ml-2 text-[#d4af37]">★ {job.user_rating}</span>}
+              <Link href={`/jobs/detail?id=${job.id}`} key={job.id}>
+                <Card
+                  className="hover:shadow-lg transition-shadow border-2 hover:border-[#d4af37] bg-white/90 backdrop-blur animate-fade-in-up"
+                  style={{ animationDelay: `${index * 0.05}s` }}
+                >
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <CardTitle className="text-xl text-[#1e3a5f] mb-2">{job.title}</CardTitle>
+                        <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
+                          <div className="flex items-center">
+                            <span className="font-medium">{job.user_name || 'Campus Helper user'}</span>
+                            {job.user_rating && <span className="ml-2 text-[#d4af37]">★ {job.user_rating}</span>}
+                          </div>
+                          <span className="text-gray-400">•</span>
+                          <span>{job.posted ? formatDate(job.posted) : formatDate(job.created_at) || 'Recently posted'}</span>
                         </div>
-                        <span className="text-gray-400">•</span>
-                        <span>{job.posted ? formatDate(job.posted) : formatDate(job.created_at) || 'Recently posted'}</span>
+                      </div>
+                      <Badge className="bg-[#d4af37] text-[#1e3a5f] hover:bg-[#c19b2e]">
+                        {job.category}
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-gray-700 mb-4">{job.description}</p>
+
+                    <div className="flex flex-wrap items-center gap-4 text-sm">
+                      <div className="flex items-center text-gray-600">
+                        <DollarSign className="w-4 h-4 mr-1 text-[#d4af37]" />
+                        <span className="font-semibold text-[#1e3a5f]">
+                          ${job.pay_rate}
+                        </span>
+                        <span className="ml-1">
+                          {job.pay_type === 'hourly' ? '/hr' : job.pay_type === 'fixed' ? 'total' : 'negotiable'}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center text-gray-600">
+                        <MapPin className="w-4 h-4 mr-1 text-[#d4af37]" />
+                        {job.location}
+                      </div>
+
+                      <div className="flex items-center text-gray-600">
+                        <Clock className="w-4 h-4 mr-1 text-[#d4af37]" />
+                        {(job.status || 'open') === 'open' ? 'Open' : 'Closed'}
                       </div>
                     </div>
-                    <Badge className="bg-[#d4af37] text-[#1e3a5f] hover:bg-[#c19b2e]">
-                      {job.category}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-700 mb-4">{job.description}</p>
 
-                  <div className="flex flex-wrap items-center gap-4 text-sm">
-                    <div className="flex items-center text-gray-600">
-                      <DollarSign className="w-4 h-4 mr-1 text-[#d4af37]" />
-                      <span className="font-semibold text-[#1e3a5f]">
-                        ${job.pay_rate}
-                      </span>
-                      <span className="ml-1">
-                        {job.pay_type === 'hourly' ? '/hr' : job.pay_type === 'fixed' ? 'total' : 'negotiable'}
-                      </span>
+                    <div className="mt-4 pt-4 border-t flex items-center justify-between text-sm text-gray-500">
+                      <span>Updated {formatDate(job.updated_at || job.created_at) || 'recently'}</span>
+                      <span className="text-[#1e3a5f] group-hover:text-[#d4af37]">View Details →</span>
                     </div>
-
-                    <div className="flex items-center text-gray-600">
-                      <MapPin className="w-4 h-4 mr-1 text-[#d4af37]" />
-                      {job.location}
-                    </div>
-
-                <div className="flex items-center text-gray-600">
-                  <Clock className="w-4 h-4 mr-1 text-[#d4af37]" />
-                  {(job.status || 'open') === 'open' ? 'Open' : 'Closed'}
-                </div>
-              </div>
-
-              <div className="mt-4 pt-4 border-t flex items-center justify-between text-sm text-gray-500">
-                <span>Updated {formatDate(job.updated_at || job.created_at) || 'recently'}</span>
-                <Button
-                  variant="ghost"
-                  className="text-[#1e3a5f] hover:text-[#d4af37] hover:bg-transparent"
-                  onClick={() => router.push(`/jobs/detail?id=${job.id}`)}
-                >
-                  View Details →
-                </Button>
-              </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
 
           {filteredJobs.length === 0 && (
             <div className="text-center py-12">
