@@ -171,8 +171,15 @@ export function Navigation() {
               </Button>
             </Link>
             <Link href="/ai-assistant">
-              <Button variant="ghost" className="text-white hover:text-[#d4af37] hover:bg-[#2a4a6f]">
-                <Sparkles className="w-4 h-4 mr-2" />
+              <Button
+                variant="ghost"
+                className="group relative overflow-hidden text-white hover:text-white bg-gradient-to-r from-purple-500 via-purple-600 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 border border-purple-300/50 shadow-[0_8px_30px_rgba(126,34,206,0.35)] transition-all duration-300 hover:-translate-y-0.5"
+              >
+                <span className="pointer-events-none absolute inset-[-10%] blur-2xl bg-purple-500/40 group-hover:bg-purple-400/50 transition-colors duration-500" />
+                <span className="pointer-events-none absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-30 transition-opacity" />
+                <span className="pointer-events-none absolute inset-0 translate-x-[-150%] bg-gradient-to-r from-transparent via-white/60 to-transparent opacity-70 animate-[shimmer_2.5s_ease-in-out_infinite]" />
+                <span className="pointer-events-none absolute -inset-px rounded-lg border border-white/20 opacity-0 group-hover:opacity-80 transition-opacity duration-500 animate-[pulse_2.8s_ease-in-out_infinite]" />
+                <Sparkles className="w-4 h-4 mr-2 drop-shadow-[0_0_10px_rgba(255,255,255,0.35)]" />
                 AI
               </Button>
             </Link>
