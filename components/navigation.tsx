@@ -214,7 +214,7 @@ export function Navigation() {
             <Button
               variant="ghost"
               size="icon"
-              className="h-10 w-10 text-white hover:text-[#d4af37] hover:bg-[#2a4a6f] md:hidden"
+              className="h-10 w-10 text-white hover:text-[#d4af37] hover:bg-[#2a4a6f] lg:hidden"
               aria-label="Toggle menu"
               onClick={() => setMobileOpen((prev) => !prev)}
             >
@@ -223,7 +223,7 @@ export function Navigation() {
           </div>
         </div>
         {mobileOpen && (
-          <div className="md:hidden mt-3 space-y-2 border-t border-white/10 pt-3 pb-4">
+          <div className="lg:hidden mt-3 space-y-2 border-t border-white/10 pt-3 pb-4">
             <div className="grid grid-cols-2 gap-3 px-1">
               <Link href="/jobs" onClick={() => setMobileOpen(false)}>
                 <Button variant="ghost" className="w-full justify-center bg-white/10 text-white">
