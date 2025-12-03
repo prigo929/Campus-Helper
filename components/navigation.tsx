@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
-import { Briefcase, ShoppingBag, MessageSquare, User, LogOut, Loader2, Shield, Sparkles } from 'lucide-react';
+import { Briefcase, ShoppingBag, MessageSquare, User, LogOut, Loader2, Shield, Sparkles, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { supabase } from '@/lib/supabase';
@@ -168,6 +168,12 @@ export function Navigation() {
               <Button variant="ghost" className="text-white hover:text-[#d4af37] hover:bg-[#2a4a6f]">
                 <MessageSquare className="w-4 h-4 mr-2" />
                 Forum
+              </Button>
+            </Link>
+            <Link href="/search">
+              <Button variant="ghost" className="text-white hover:text-[#d4af37] hover:bg-[#2a4a6f]">
+                <Search className="w-4 h-4 mr-2" />
+                Search
               </Button>
             </Link>
             <Link href="/ai-assistant">
