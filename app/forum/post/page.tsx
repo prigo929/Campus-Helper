@@ -2,7 +2,7 @@
 
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { ArrowLeft, MessageSquare, Eye, Loader2, AlertCircle, Flag } from 'lucide-react';
 import { Navigation } from '@/components/navigation';
 import { Footer } from '@/components/footer';
@@ -31,6 +31,19 @@ const fallbackPost: ForumPost = {
   updated_at: '',
 };
 
+type FlatComment = {
+  id: string;
+  content: string;
+  created_at: string;
+  user_id: string;
+  author: string;
+  parent_id: string | null;
+};
+
+type ThreadedComment = FlatComment & {
+  replies: ThreadedComment[];
+};
+
 export default function ForumDetailPage() {
   const router = useRouter();
   const params = useSearchParams();
@@ -41,11 +54,12 @@ export default function ForumDetailPage() {
   const [error, setError] = useState('');
   const [author, setAuthor] = useState('Campus Helper user');
   const [authorId, setAuthorId] = useState<string | null>(null);
-  const [comments, setComments] = useState<
-    { id: string; content: string; created_at: string; user_id: string; author: string }[]
-  >([]);
+  const [comments, setComments] = useState<ThreadedComment[]>([]);
+  const [commentLookup, setCommentLookup] = useState<Record<string, FlatComment>>({});
   const [reply, setReply] = useState('');
   const [replyError, setReplyError] = useState('');
+  const [replyNotice, setReplyNotice] = useState('');
+  const [replyingToCommentId, setReplyingToCommentId] = useState<string | null>(null);
   const [replying, setReplying] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
   const [reportReason, setReportReason] = useState('spam');
@@ -121,36 +135,84 @@ export default function ForumDetailPage() {
     load();
   }, [id]);
 
-  useEffect(() => {
-    const loadComments = async () => {
-      if (!supabase || !post?.id || !hasSession) return;
-      const { data, error: commentsError } = await supabase
-        .from('forum_comments')
-        .select('id, content, created_at, user_id, profiles(full_name,email)')
-        .eq('post_id', post.id)
-        .order('created_at', { ascending: false });
-      if (commentsError) {
-        console.error('Comments load error', commentsError);
-        return;
+  const buildThread = useCallback((items: FlatComment[]): ThreadedComment[] => {
+    const map = new Map<string, ThreadedComment>();
+    const roots: ThreadedComment[] = [];
+
+    items.forEach((item) => {
+      map.set(item.id, { ...item, replies: [] });
+    });
+
+    map.forEach((comment) => {
+      if (comment.parent_id && map.has(comment.parent_id)) {
+        map.get(comment.parent_id)!.replies.push(comment);
+      } else {
+        roots.push(comment);
       }
-      const mapped =
-        data?.map((c) => ({
-          id: c.id,
-          content: c.content,
-          created_at: c.created_at,
-          user_id: c.user_id,
-          author: (c as any).profiles?.full_name || (c as any).profiles?.email || 'Campus Helper user',
-        })) || [];
-      setComments(mapped);
+    });
+
+    const sortThread = (list: ThreadedComment[]) => {
+      list.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+      list.forEach((reply) => sortThread(reply.replies));
     };
+
+    sortThread(roots);
+    return roots;
+  }, []);
+
+  const loadComments = useCallback(async () => {
+    if (!supabase || !post?.id || !hasSession) return;
+    const fetchComments = (includeParent: boolean) =>
+      supabase
+        .from('forum_comments')
+        .select(
+          includeParent
+            ? 'id, content, created_at, user_id, parent_id, profiles(full_name,email)'
+            : 'id, content, created_at, user_id, profiles(full_name,email)'
+        )
+        .eq('post_id', post.id)
+        .order('created_at', { ascending: true });
+
+    let { data, error: commentsError } = await fetchComments(true);
+    if (commentsError && commentsError.message?.toLowerCase().includes('parent_id')) {
+      console.warn('parent_id missing in schema cache; falling back to flat comments');
+      ({ data, error: commentsError } = await fetchComments(false));
+    }
+    if (commentsError) {
+      console.error('Comments load error', commentsError);
+      return;
+    }
+    const mapped =
+      data?.map((c) => ({
+        id: c.id,
+        content: c.content,
+        created_at: c.created_at,
+        user_id: c.user_id,
+        parent_id: (c as any).parent_id || null,
+        author: (c as any).profiles?.full_name || (c as any).profiles?.email || 'Campus Helper user',
+      })) || [];
+
+    setCommentLookup(
+      mapped.reduce((acc, curr) => {
+        acc[curr.id] = curr;
+        return acc;
+      }, {} as Record<string, FlatComment>)
+    );
+    setComments(buildThread(mapped));
+  }, [post?.id, hasSession, buildThread]);
+
+  useEffect(() => {
     loadComments();
-  }, [post?.id, hasSession]);
+  }, [loadComments]);
 
   const formatDate = (value?: string | null) =>
     value ? new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
 
+  const replyingToAuthor = replyingToCommentId ? commentLookup[replyingToCommentId]?.author : null;
+
   const handleReply = async () => {
     setReplyError('');
+    setReplyNotice('');
     if (!supabase) {
       setReplyError('Supabase is not configured.');
       return;
@@ -171,33 +233,93 @@ export default function ForumDetailPage() {
       setReplying(false);
       return;
     }
-    const { error: insertError } = await supabase.from('forum_comments').insert({
+    const payload: Record<string, any> = {
       post_id: post.id,
       user_id: userId,
       content: reply.trim(),
-    });
+    };
+    if (replyingToCommentId) payload.parent_id = replyingToCommentId;
+
+    let { error: insertError } = await supabase.from('forum_comments').insert(payload);
+    if (insertError && insertError.message?.toLowerCase().includes('parent_id')) {
+      console.warn('parent_id not found; retrying insert without parent link');
+      delete payload.parent_id;
+      ({ error: insertError } = await supabase.from('forum_comments').insert(payload));
+      if (!insertError) {
+        setReplyNotice('Threaded replies need the latest migration; comment added at the top level.');
+      }
+    }
     if (insertError) {
       setReplyError(insertError.message);
       setReplying(false);
       return;
     }
     setReply('');
-    // reload comments
-    const { data: refreshed } = await supabase
-      .from('forum_comments')
-      .select('id, content, created_at, user_id, profiles(full_name,email)')
-      .eq('post_id', post.id)
-      .order('created_at', { ascending: false });
-    const mapped =
-      refreshed?.map((c) => ({
-        id: c.id,
-        content: c.content,
-        created_at: c.created_at,
-        user_id: c.user_id,
-        author: (c as any).profiles?.full_name || (c as any).profiles?.email || 'Campus Helper user',
-      })) || [];
-    setComments(mapped);
+    setReplyingToCommentId(null);
+    await loadComments();
     setReplying(false);
+  };
+
+  const renderCommentThread = (comment: ThreadedComment, depth = 0) => {
+    const indentStyle = depth > 0 ? { marginLeft: depth * 8 } : undefined;
+    const containerClasses = depth > 0 ? 'border-l border-gray-200 pl-3' : '';
+    const cardClasses = depth > 0 ? 'border-gray-200 bg-white' : 'border-gray-100 bg-gray-50';
+
+    return (
+      <div key={comment.id} className={`space-y-1 ${containerClasses}`} style={indentStyle}>
+        <div className={`rounded-lg border px-3 py-2 ${cardClasses}`}>
+          <div className="flex items-center justify-between text-sm text-gray-600 mb-1">
+            <span className="font-semibold text-[#1e3a5f]">{comment.author}</span>
+            <div className="flex items-center gap-3">
+              <span className="text-xs text-gray-500">{formatDate(comment.created_at)}</span>
+              <button
+                type="button"
+                onClick={() => {
+                  setReplyingToCommentId(comment.id);
+                  setReply((prev) => (prev ? prev : `@${comment.author} `));
+                }}
+                className="text-xs text-[#1e3a5f] hover:underline"
+              >
+                Reply
+              </button>
+              <button
+                type="button"
+                onClick={async () => {
+                  setCommentReportMessage('');
+                  if (!supabase || !post?.id) return;
+                  const { data: sessionData } = await supabase.auth.getSession();
+                  const reporterId = sessionData.session?.user?.id;
+                  if (!reporterId) {
+                    setCommentReportMessage('Sign in to report comments.');
+                    return;
+                  }
+                  const { error: insertError } = await supabase.from('reports').insert({
+                    target_type: 'comment',
+                    target_table: 'forum_comments',
+                    target_id: comment.id,
+                    target_user_id: comment.user_id,
+                    reporter_user_id: reporterId,
+                    reason: 'comment',
+                    details: comment.content.slice(0, 200),
+                    status: 'open',
+                  });
+                  if (insertError) {
+                    setCommentReportMessage(insertError.message);
+                  } else {
+                    setCommentReportMessage('Comment reported.');
+                  }
+                }}
+                className="text-xs text-red-600 hover:underline"
+              >
+                Report
+              </button>
+            </div>
+          </div>
+          <p className="text-sm text-gray-700 whitespace-pre-line">{comment.content}</p>
+        </div>
+        {comment.replies.length > 0 && comment.replies.map((child) => renderCommentThread(child, depth + 1))}
+      </div>
+    );
   };
 
   return (
@@ -330,13 +452,30 @@ export default function ForumDetailPage() {
                     Join the discussion with your classmates.
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-3">
+                <CardContent className="space-y-4">
                   {replyError && (
                     <div className="text-sm text-red-700 bg-red-50 border border-red-200 px-3 py-2 rounded-md">
                       {replyError}
                     </div>
                   )}
+                  {replyNotice && (
+                    <div className="text-sm text-amber-700 bg-amber-50 border border-amber-200 px-3 py-2 rounded-md">
+                      {replyNotice}
+                    </div>
+                  )}
                   <div className="space-y-2">
+                    {replyingToCommentId && (
+                      <div className="flex items-center justify-between rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-700">
+                        <span>Replying to {replyingToAuthor || 'comment'}</span>
+                        <button
+                          type="button"
+                          onClick={() => setReplyingToCommentId(null)}
+                          className="text-[#1e3a5f] hover:underline"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    )}
                     <Textarea
                       placeholder="Share your thoughts..."
                       value={reply}
@@ -344,13 +483,14 @@ export default function ForumDetailPage() {
                       rows={3}
                       disabled={replying}
                     />
-                    <div className="flex justify-end">
+                    <div className="flex items-center justify-between">
+                      <p className="text-xs text-gray-500">Replies show in chronological threads.</p>
                       <Button
                         className="bg-[#1e3a5f] text-white hover:bg-[#2a4a6f]"
                         disabled={replying}
                         onClick={handleReply}
                       >
-                        {replying ? 'Posting...' : 'Post reply'}
+                        {replying ? 'Posting...' : replyingToCommentId ? 'Post reply' : 'Post comment'}
                       </Button>
                     </div>
                   </div>
@@ -359,48 +499,7 @@ export default function ForumDetailPage() {
                     {comments.length === 0 ? (
                       <p className="text-sm text-gray-600">No replies yet. Be the first to respond.</p>
                     ) : (
-                      comments.map((comment) => (
-                        <div key={comment.id} className="rounded-lg border border-gray-100 bg-gray-50 px-3 py-2">
-                          <div className="flex items-center justify-between text-sm text-gray-600 mb-1">
-                            <span className="font-semibold text-[#1e3a5f]">{comment.author}</span>
-                            <div className="flex items-center gap-3">
-                              <span className="text-xs text-gray-500">{formatDate(comment.created_at)}</span>
-                              <button
-                                type="button"
-                                onClick={async () => {
-                                  setCommentReportMessage('');
-                                  if (!supabase || !post?.id) return;
-                                  const { data: sessionData } = await supabase.auth.getSession();
-                                  const reporterId = sessionData.session?.user?.id;
-                                  if (!reporterId) {
-                                    setCommentReportMessage('Sign in to report comments.');
-                                    return;
-                                  }
-                                  const { error: insertError } = await supabase.from('reports').insert({
-                                    target_type: 'comment',
-                                    target_table: 'forum_comments',
-                                    target_id: comment.id,
-                                    target_user_id: comment.user_id,
-                                    reporter_user_id: reporterId,
-                                    reason: 'comment',
-                                    details: comment.content.slice(0, 200),
-                                    status: 'open',
-                                  });
-                                  if (insertError) {
-                                    setCommentReportMessage(insertError.message);
-                                  } else {
-                                    setCommentReportMessage('Comment reported.');
-                                  }
-                                }}
-                                className="text-xs text-red-600 hover:underline"
-                              >
-                                Report
-                              </button>
-                            </div>
-                          </div>
-                          <p className="text-sm text-gray-700 whitespace-pre-line">{comment.content}</p>
-                        </div>
-                      ))
+                      comments.map((comment) => renderCommentThread(comment))
                     )}
                     {commentReportMessage && (
                       <p className="text-xs text-gray-600">{commentReportMessage}</p>
