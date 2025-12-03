@@ -13,7 +13,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
-import { useNotifications, type NotificationItem, type NotificationType } from '@/hooks/use-notifications';
+import { useNotifications, type NotificationType } from '@/hooks/use-notifications';
+import type { Notification } from '@/lib/supabase';
 
 const typeIcon: Record<NotificationType, JSX.Element> = {
   message: <MessageCircle className="h-4 w-4 text-[#1e3a5f]" />,
@@ -64,7 +65,7 @@ export function NotificationsDropdown() {
             {notifications.length === 0 ? (
               <div className="px-4 py-6 text-sm text-gray-600">You&apos;re all caught up.</div>
             ) : (
-              notifications.map((notification: NotificationItem) => (
+              notifications.map((notification: Notification) => (
                 <DropdownMenuItem
                   key={notification.id}
                   className={cn(
@@ -76,19 +77,15 @@ export function NotificationsDropdown() {
                     markAsRead(notification.id);
                   }}
                 >
-                  <div className="mt-1 rounded-full bg-[#e8eef6] p-2 shadow-inner">
-                    {typeIcon[notification.type]}
-                  </div>
+                  <div className="mt-1 rounded-full bg-[#e8eef6] p-2 shadow-inner">{typeIcon[notification.type]}</div>
                   <div className="flex-1 space-y-1">
                     <div className="flex items-center justify-between">
                       <p className="text-sm font-semibold text-[#1e3a5f]">{notification.title}</p>
-                      <span className="text-[10px] font-semibold uppercase text-[#d4af37]">
-                        {typeLabel[notification.type]}
-                      </span>
+                      <span className="text-[10px] font-semibold uppercase text-[#d4af37]">{typeLabel[notification.type]}</span>
                     </div>
                     <p className="text-sm text-gray-700 leading-snug">{notification.body}</p>
                     <p className="text-xs text-gray-500">
-                      {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
+                      {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })}
                     </p>
                   </div>
                 </DropdownMenuItem>

@@ -90,3 +90,14 @@ export type Rating = {
   transaction_id?: string;
   created_at: string;
 };
+
+export type Notification = {
+  id: string;
+  user_id: string;
+  type: 'message' | 'job' | 'comment';
+  title: string;
+  body: string;
+  read: boolean;
+  metadata?: Record<string, unknown>;
+  created_at: string;
+};
