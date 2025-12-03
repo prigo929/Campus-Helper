@@ -3,7 +3,19 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
-import { Briefcase, ShoppingBag, MessageSquare, User, LogOut, Loader2, Shield, Sparkles, Search } from 'lucide-react';
+import {
+  Briefcase,
+  ShoppingBag,
+  MessageSquare,
+  User,
+  LogOut,
+  Loader2,
+  Shield,
+  Sparkles,
+  Search,
+  Menu,
+  X,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { supabase } from '@/lib/supabase';
@@ -16,6 +28,7 @@ export function Navigation() {
   const [displayName, setDisplayName] = useState('');
   const [email, setEmail] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -128,7 +141,7 @@ export function Navigation() {
                 </Link>
                 <Button
                   variant="outline"
-                  className="border-white bg-white/10 text-white hover:bg-white hover:text-[#1e3a5f]"
+                  className="border-white bg-white/10 text-white hover:bg-white hover:text-[#1e3a5f] hidden sm:inline-flex"
                   onClick={handleSignOut}
                   disabled={loading}
                 >
@@ -150,6 +163,14 @@ export function Navigation() {
                 </Link>
               </>
             )}
+            <Button
+              variant="ghost"
+              className="text-white hover:text-[#d4af37] hover:bg-[#2a4a6f] md:hidden"
+              aria-label="Toggle menu"
+              onClick={() => setMobileOpen((prev) => !prev)}
+            >
+              {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </Button>
           </div>
           <div className="hidden md:flex items-center space-x-1 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
             <Link href="/jobs">
@@ -191,6 +212,59 @@ export function Navigation() {
             </Link>
           </div>
         </div>
+        {mobileOpen && (
+          <div className="md:hidden mt-3 space-y-2 border-t border-white/10 pt-3">
+            <div className="grid grid-cols-2 gap-2">
+              <Link href="/jobs" onClick={() => setMobileOpen(false)}>
+                <Button variant="ghost" className="w-full justify-center bg-white/10 text-white">
+                  <Briefcase className="w-4 h-4 mr-2" />
+                  Jobs
+                </Button>
+              </Link>
+              <Link href="/marketplace" onClick={() => setMobileOpen(false)}>
+                <Button variant="ghost" className="w-full justify-center bg-white/10 text-white">
+                  <ShoppingBag className="w-4 h-4 mr-2" />
+                  Market
+                </Button>
+              </Link>
+              <Link href="/forum" onClick={() => setMobileOpen(false)}>
+                <Button variant="ghost" className="w-full justify-center bg-white/10 text-white">
+                  <MessageSquare className="w-4 h-4 mr-2" />
+                  Forum
+                </Button>
+              </Link>
+              <Link href="/search" onClick={() => setMobileOpen(false)}>
+                <Button variant="ghost" className="w-full justify-center bg-white/10 text-white">
+                  <Search className="w-4 h-4 mr-2" />
+                  Search
+                </Button>
+              </Link>
+              <Link href="/ai-assistant" onClick={() => setMobileOpen(false)}>
+                <Button className="w-full justify-center bg-gradient-to-r from-purple-500 via-purple-600 to-indigo-500 text-white border border-purple-300/50 shadow-[0_8px_20px_rgba(126,34,206,0.35)]">
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  AI
+                </Button>
+              </Link>
+              {isAuthed ? (
+                <Button
+                  className="w-full justify-center bg-white text-[#1e3a5f]"
+                  onClick={() => {
+                    setMobileOpen(false);
+                    handleSignOut();
+                  }}
+                  disabled={loading}
+                >
+                  {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogOut className="w-4 h-4 mr-2" />}
+                  Sign out
+                </Button>
+              ) : (
+                <Link href="/sign-in" onClick={() => setMobileOpen(false)}>
+                  <Button className="w-full justify-center bg-[#d4af37] text-[#1e3a5f]">Sign In</Button>
+                </Link>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </nav>
   );

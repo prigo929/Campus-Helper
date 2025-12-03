@@ -83,7 +83,7 @@ export default function SearchPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-indigo-50">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 space-y-8">
         <header className="space-y-3">
           <div className="inline-flex items-center gap-2 rounded-full bg-purple-100 text-purple-700 px-3 py-1 text-sm font-semibold">
             <Search className="w-4 h-4" />
@@ -129,7 +129,7 @@ export default function SearchPage() {
           </Card>
         )}
 
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           <Card className="bg-white/90 backdrop-blur border-gray-100 shadow-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-[#1e3a5f]">
