@@ -56,25 +56,23 @@ export default function SupportPage() {
             {supportResources.map((resource, index) => {
               const Icon = resource.icon;
               return (
-                <Card
-                  key={resource.title}
-                  className="h-full border-2 border-gray-100 hover:border-[#d4af37] transition-shadow hover:shadow-2xl bg-white/90 backdrop-blur animate-fade-in-up"
-                  style={{ animationDelay: `${index * 0.08}s` }}
-                >
-                  <CardHeader className="space-y-3">
-                    <div className="w-12 h-12 rounded-xl bg-[#1e3a5f] text-[#d4af37] flex items-center justify-center shadow">
-                      <Icon className="w-5 h-5" />
-                    </div>
-                    <CardTitle className="text-xl text-[#1e3a5f]">{resource.title}</CardTitle>
-                    <CardDescription className="text-gray-600">{resource.description}</CardDescription>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <Link href={resource.href} className="inline-flex items-center text-[#1e3a5f] font-semibold hover:text-[#d4af37]">
-                      <span>Open {resource.title}</span>
-                      <span className="ml-2">→</span>
-                    </Link>
-                  </CardContent>
-                </Card>
+                <Link href={resource.href} key={resource.title} className="animate-fade-in-up" style={{ animationDelay: `${index * 0.08}s` }}>
+                  <Card className="h-full border-2 border-gray-100 hover:border-[#d4af37] transition-shadow hover:shadow-2xl bg-white/90 backdrop-blur">
+                    <CardHeader className="space-y-3">
+                      <div className="w-12 h-12 rounded-xl bg-[#1e3a5f] text-[#d4af37] flex items-center justify-center shadow">
+                        <Icon className="w-5 h-5" />
+                      </div>
+                      <CardTitle className="text-xl text-[#1e3a5f]">{resource.title}</CardTitle>
+                      <CardDescription className="text-gray-600">{resource.description}</CardDescription>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <span className="inline-flex items-center text-[#1e3a5f] font-semibold hover:text-[#d4af37]">
+                        <span>Open {resource.title}</span>
+                        <span className="ml-2">→</span>
+                      </span>
+                    </CardContent>
+                  </Card>
+                </Link>
               );
             })}
           </div>
