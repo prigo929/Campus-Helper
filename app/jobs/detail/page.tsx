@@ -47,6 +47,7 @@ export default function JobDetailPage() {
   const [error, setError] = useState('');
   const [poster, setPoster] = useState('Campus Helper user');
   const [posterId, setPosterId] = useState<string | null>(null);
+  const [posterEmail, setPosterEmail] = useState<string | null>(null);
   const [reviews, setReviews] = useState<Rating[]>([]);
   const [ratingSummary, setRatingSummary] = useState<{ rating?: number | null; total_ratings?: number | null }>({});
   const [newRating, setNewRating] = useState('5');
@@ -129,6 +130,7 @@ export default function JobDetailPage() {
         const profile = (data as any).profiles;
         setPoster(profile?.full_name || profile?.email || 'Campus Helper user');
         setPosterId(data.user_id || null);
+        setPosterEmail(profile?.email || null);
         setRatingSummary({ rating: profile?.rating, total_ratings: profile?.total_ratings });
       }
 
@@ -198,6 +200,13 @@ export default function JobDetailPage() {
                   }>
                     {status}
                   </Badge>
+                  {posterEmail && (
+                    <Link href={`mailto:${posterEmail}?subject=${encodeURIComponent(`Job: ${job?.title || ''}`)}`}>
+                      <Button size="sm" className="bg-[#1e3a5f] text-white hover:bg-[#2a4a6f] w-full">
+                        Contact poster
+                      </Button>
+                    </Link>
+                  )}
                   <Dialog open={reportOpen} onOpenChange={setReportOpen}>
                     <Button
                       variant="outline"
