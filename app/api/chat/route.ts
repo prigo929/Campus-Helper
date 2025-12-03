@@ -30,8 +30,10 @@ export async function POST(req: Request) {
   const uiMessages = messages.map(({ id: _id, ...rest }) => rest) as Parameters<typeof convertToModelMessages>[0];
   const modelMessages = convertToModelMessages(uiMessages);
 
+  const groqModel = process.env.GROQ_MODEL || 'llama-3.1-8b-instant';
+
   const model = process.env.GROQ_API_KEY
-    ? groq('llama3-70b-8192')
+    ? groq(groqModel)
     : gateway
       ? gateway('openai/gpt-4o-mini')
       : openai('gpt-4o-mini');
@@ -44,7 +46,7 @@ export async function POST(req: Request) {
     temperature: 0.6,
   });
 
-  return result.toTextStreamResponse();
+  return result.toUIMessageStreamResponse();
 }
 
 export async function GET() {
