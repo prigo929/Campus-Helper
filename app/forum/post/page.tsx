@@ -51,6 +51,7 @@ export default function ForumDetailPage() {
   const [reportReason, setReportReason] = useState('spam');
   const [reportDetails, setReportDetails] = useState('');
   const [reportMessage, setReportMessage] = useState('');
+  const [commentReportMessage, setCommentReportMessage] = useState('');
   const handleReportSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     if (!post?.id) return;
@@ -343,10 +344,30 @@ export default function ForumDetailPage() {
                               <span className="text-xs text-gray-500">{formatDate(comment.created_at)}</span>
                               <button
                                 type="button"
-                                onClick={() => {
-                                  const subject = encodeURIComponent(`Report forum comment ${comment.id}`);
-                                  const body = encodeURIComponent(`I want to report comment ID ${comment.id} on post ${post?.id}.\n\nReason:\n`);
-                                  window.location.href = `mailto:support@campushelper.test?subject=${subject}&body=${body}`;
+                                onClick={async () => {
+                                  setCommentReportMessage('');
+                                  if (!supabase || !post?.id) return;
+                                  const { data: sessionData } = await supabase.auth.getSession();
+                                  const reporterId = sessionData.session?.user?.id;
+                                  if (!reporterId) {
+                                    setCommentReportMessage('Sign in to report comments.');
+                                    return;
+                                  }
+                                  const { error: insertError } = await supabase.from('reports').insert({
+                                    target_type: 'comment',
+                                    target_table: 'forum_comments',
+                                    target_id: comment.id,
+                                    target_user_id: comment.user_id,
+                                    reporter_user_id: reporterId,
+                                    reason: 'comment',
+                                    details: comment.content.slice(0, 200),
+                                    status: 'open',
+                                  });
+                                  if (insertError) {
+                                    setCommentReportMessage(insertError.message);
+                                  } else {
+                                    setCommentReportMessage('Comment reported.');
+                                  }
                                 }}
                                 className="text-xs text-red-600 hover:underline"
                               >
@@ -357,6 +378,9 @@ export default function ForumDetailPage() {
                           <p className="text-sm text-gray-700 whitespace-pre-line">{comment.content}</p>
                         </div>
                       ))
+                    )}
+                    {commentReportMessage && (
+                      <p className="text-xs text-gray-600">{commentReportMessage}</p>
                     )}
                   </div>
                 </CardContent>

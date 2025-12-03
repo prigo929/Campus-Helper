@@ -58,9 +58,36 @@ export default function JobDetailPage() {
   const [reportReason, setReportReason] = useState('spam');
   const [reportDetails, setReportDetails] = useState('');
   const [reportMessage, setReportMessage] = useState('');
-  const handleReportSubmit = (event: React.FormEvent) => {
+  const [reportError, setReportError] = useState('');
+  const handleReportSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    setReportError('');
+    setReportMessage('');
     if (!job?.id) return;
+    if (!supabase) {
+      setReportError('Supabase is not configured.');
+      return;
+    }
+    const { data: sessionData } = await supabase.auth.getSession();
+    const reporterId = sessionData.session?.user?.id;
+    if (!reporterId) {
+      setReportError('Please sign in to report.');
+      return;
+    }
+    const { error: insertError } = await supabase.from('reports').insert({
+      target_type: 'job',
+      target_table: 'jobs',
+      target_id: job.id,
+      target_user_id: posterId,
+      reporter_user_id: reporterId,
+      reason: reportReason,
+      details: reportDetails,
+      status: 'open',
+    });
+    if (insertError) {
+      setReportError(insertError.message);
+      return;
+    }
     setReportMessage('Report submitted. Thanks for letting us know.');
     setReportDetails('');
     setReportOpen(false);
@@ -221,6 +248,9 @@ export default function JobDetailPage() {
                         </DialogFooter>
                         {reportMessage && (
                           <p className="text-sm text-green-700">{reportMessage}</p>
+                        )}
+                        {reportError && (
+                          <p className="text-sm text-red-700">{reportError}</p>
                         )}
                       </form>
                     </DialogContent>

@@ -291,6 +291,7 @@ for (const demo of demos) {
     major: demo.major,
     year: demo.year,
     bio: demo.bio,
+    role: demo.role || 'user',
   });
 
   if (profileErr) {
