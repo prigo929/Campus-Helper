@@ -1,10 +1,15 @@
 import { openai } from '@ai-sdk/openai';
 import { streamText, type CoreMessage } from 'ai';
+import { createGateway } from '@ai-sdk/gateway';
 
 export const runtime = 'edge';
 
 export async function POST(req: Request) {
-  if (!process.env.OPENAI_API_KEY) {
+  const gateway = process.env.AI_GATEWAY_API_KEY
+    ? createGateway({ apiKey: process.env.AI_GATEWAY_API_KEY })
+    : null;
+
+  if (!gateway && !process.env.OPENAI_API_KEY) {
     return new Response(JSON.stringify({ error: 'Missing OPENAI_API_KEY' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
@@ -20,8 +25,10 @@ export async function POST(req: Request) {
     });
   }
 
+  const model = gateway ? gateway('openai/gpt-4o-mini') : openai('gpt-4o-mini');
+
   const result = await streamText({
-    model: openai('gpt-4o-mini'),
+    model,
     system:
       'You are Campus Helper AI, a concise assistant for students. Keep answers short, helpful, and focused on jobs, marketplace, forum, and campus life. If asked about account data, remind them you cannot see their private information.',
     messages,
