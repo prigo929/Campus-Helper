@@ -13,17 +13,27 @@ export const metadata: Metadata = {
 
 export default function AiAssistantPage() {
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-gray-50 to-white">
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-gray-50 via-white to-indigo-50 relative overflow-hidden">
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute -left-10 -top-16 h-72 w-72 rounded-full bg-purple-400/30 blur-3xl animate-pulse" />
+        <div className="absolute right-0 top-10 h-80 w-80 rounded-full bg-indigo-400/25 blur-3xl animate-[pulse_4s_ease-in-out_infinite]" />
+        <div className="absolute -bottom-24 left-1/2 h-96 w-96 rounded-full bg-purple-500/20 blur-[120px] animate-[pulse_5s_ease-in-out_infinite]" />
+      </div>
       <Navigation />
 
       <main className="flex-1">
         <section className="py-12">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-            <Card className="border-0 bg-gradient-to-br from-[#1e3a5f] via-[#1f3f65] to-[#162b48] text-white shadow-xl">
-              <CardContent className="p-6 md:p-8 space-y-4">
+            <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-[#1e3a5f] via-[#1f3f65] to-[#162b48] text-white shadow-2xl ring-1 ring-white/10">
+              <span className="pointer-events-none absolute inset-[-10%] bg-gradient-to-r from-purple-500/20 via-white/10 to-indigo-400/20 blur-2xl animate-[pulse_4s_ease-in-out_infinite]" />
+              <span className="pointer-events-none absolute inset-0 translate-x-[-150%] bg-gradient-to-r from-transparent via-white/50 to-transparent opacity-70 animate-[shimmer_3s_ease-in-out_infinite]" />
+              <CardContent className="p-6 md:p-8 space-y-4 relative z-10">
                 <Badge className="bg-white/15 text-white border-white/30 w-fit">New</Badge>
                 <h1 className="text-3xl md:text-4xl font-bold leading-tight flex items-center gap-3">
-                  <Sparkles className="w-7 h-7 text-[#f4d03f]" />
+                  <span className="relative">
+                    <span className="pointer-events-none absolute inset-0 blur-lg bg-purple-400/60 animate-pulse" />
+                    <Sparkles className="w-7 h-7 text-[#f4d03f] relative drop-shadow-[0_0_12px_rgba(255,255,255,0.5)]" />
+                  </span>
                   Campus Helper AI
                 </h1>
                 <p className="text-lg text-gray-200 max-w-3xl">
