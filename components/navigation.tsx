@@ -92,6 +92,7 @@ export function Navigation() {
     setIsAuthed(false);
     setDisplayName('');
     setEmail('');
+    setIsAdmin(false);
     setLoading(false);
     router.refresh();
   };
@@ -99,17 +100,68 @@ export function Navigation() {
   return (
     <nav className="bg-[#1e3a5f] text-white shadow-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-        <div className="flex items-center justify-between h-16">
-          <div className="flex items-center space-x-2">
+        <div className="grid grid-cols-[auto,1fr,auto] items-center h-16 gap-2">
+          <div className="flex items-center space-x-2 w-[260px]">
             <Link href="/" className="flex items-center space-x-2">
               <div className="w-8 h-8 min-w-[2rem] min-h-[2rem] shrink-0 bg-gradient-to-br from-[#d4af37] to-[#f4d03f] rounded-lg flex items-center justify-center font-bold text-[#1e3a5f]">
                 CH
               </div>
               <span className="text-xl font-bold">Campus Helper</span>
             </Link>
+            {isAdmin && (
+              <Link href="/admin/reports" className="hidden md:inline-flex">
+                <Button
+                  variant="default"
+                  className="bg-white text-[#1e3a5f] hover:bg-[#d4af37] hover:text-[#1e3a5f] font-semibold border border-[#d4af37]"
+                >
+                  <Shield className="w-4 h-4 mr-2" />
+                  Admin
+                </Button>
+              </Link>
+            )}
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="hidden lg:flex items-center space-x-1 justify-center">
+            <Link href="/jobs">
+              <Button variant="ghost" className="text-white hover:text-[#d4af37] hover:bg-[#2a4a6f]">
+                <Briefcase className="w-4 h-4 mr-2" />
+                Jobs
+              </Button>
+            </Link>
+            <Link href="/marketplace">
+              <Button variant="ghost" className="text-white hover:text-[#d4af37] hover:bg-[#2a4a6f]">
+                <ShoppingBag className="w-4 h-4 mr-2" />
+                Marketplace
+              </Button>
+            </Link>
+            <Link href="/forum">
+              <Button variant="ghost" className="text-white hover:text-[#d4af37] hover:bg-[#2a4a6f]">
+                <MessageSquare className="w-4 h-4 mr-2" />
+                Forum
+              </Button>
+            </Link>
+            <Link href="/search">
+              <Button variant="ghost" className="text-white hover:text-[#d4af37] hover:bg-[#2a4a6f]">
+                <Search className="w-4 h-4 mr-2" />
+                Search
+              </Button>
+            </Link>
+            <Link href="/ai-assistant">
+              <Button
+                variant="ghost"
+                className="group relative overflow-hidden text-white hover:text-white bg-gradient-to-r from-purple-500 via-purple-600 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 border border-purple-300/50 shadow-[0_8px_30px_rgba(126,34,206,0.35)] transition-all duration-300 hover:-translate-y-0.5"
+              >
+                <span className="pointer-events-none absolute inset-[-10%] blur-2xl bg-purple-500/40 group-hover:bg-purple-400/50 transition-colors duration-500" />
+                <span className="pointer-events-none absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-30 transition-opacity" />
+                <span className="pointer-events-none absolute inset-0 translate-x-[-150%] bg-gradient-to-r from-transparent via-white/60 to-transparent opacity-70 animate-[shimmer_2.5s_ease-in-out_infinite]" />
+                <span className="pointer-events-none absolute -inset-px rounded-lg border border-white/20 opacity-0 group-hover:opacity-80 transition-opacity duration-500 animate-[pulse_2.8s_ease-in-out_infinite]" />
+                <Sparkles className="w-4 h-4 mr-2 drop-shadow-[0_0_10px_rgba(255,255,255,0.35)]" />
+                AI
+              </Button>
+            </Link>
+          </div>
+
+          <div className="flex items-center gap-2 justify-end w-[260px]">
             {isAuthed ? (
               <>
                 <NotificationsDropdown />
@@ -122,17 +174,6 @@ export function Navigation() {
                     <MessageSquare className="w-5 h-5" />
                   </Button>
                 </Link>
-                {isAdmin && (
-                  <Link href="/admin/reports">
-                    <Button
-                      variant="default"
-                      className="bg-white text-[#1e3a5f] hover:bg-[#d4af37] hover:text-[#1e3a5f] font-semibold border border-[#d4af37]"
-                    >
-                      <Shield className="w-4 h-4 mr-2" />
-                      Admin
-                    </Button>
-                  </Link>
-                )}
                 <Link href="/profile">
                   <Button
                     variant="ghost"
@@ -179,45 +220,6 @@ export function Navigation() {
             >
               {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </Button>
-          </div>
-          <div className="hidden md:flex items-center space-x-1 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-            <Link href="/jobs">
-              <Button variant="ghost" className="text-white hover:text-[#d4af37] hover:bg-[#2a4a6f]">
-                <Briefcase className="w-4 h-4 mr-2" />
-                Jobs
-              </Button>
-            </Link>
-            <Link href="/marketplace">
-              <Button variant="ghost" className="text-white hover:text-[#d4af37] hover:bg-[#2a4a6f]">
-                <ShoppingBag className="w-4 h-4 mr-2" />
-                Marketplace
-              </Button>
-            </Link>
-            <Link href="/forum">
-              <Button variant="ghost" className="text-white hover:text-[#d4af37] hover:bg-[#2a4a6f]">
-                <MessageSquare className="w-4 h-4 mr-2" />
-                Forum
-              </Button>
-            </Link>
-            <Link href="/search">
-              <Button variant="ghost" className="text-white hover:text-[#d4af37] hover:bg-[#2a4a6f]">
-                <Search className="w-4 h-4 mr-2" />
-                Search
-              </Button>
-            </Link>
-            <Link href="/ai-assistant">
-              <Button
-                variant="ghost"
-                className="group relative overflow-hidden text-white hover:text-white bg-gradient-to-r from-purple-500 via-purple-600 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 border border-purple-300/50 shadow-[0_8px_30px_rgba(126,34,206,0.35)] transition-all duration-300 hover:-translate-y-0.5"
-              >
-                <span className="pointer-events-none absolute inset-[-10%] blur-2xl bg-purple-500/40 group-hover:bg-purple-400/50 transition-colors duration-500" />
-                <span className="pointer-events-none absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-30 transition-opacity" />
-                <span className="pointer-events-none absolute inset-0 translate-x-[-150%] bg-gradient-to-r from-transparent via-white/60 to-transparent opacity-70 animate-[shimmer_2.5s_ease-in-out_infinite]" />
-                <span className="pointer-events-none absolute -inset-px rounded-lg border border-white/20 opacity-0 group-hover:opacity-80 transition-opacity duration-500 animate-[pulse_2.8s_ease-in-out_infinite]" />
-                <Sparkles className="w-4 h-4 mr-2 drop-shadow-[0_0_10px_rgba(255,255,255,0.35)]" />
-                AI
-              </Button>
-            </Link>
           </div>
         </div>
         {mobileOpen && (
