@@ -234,22 +234,7 @@ export default function ForumPage() {
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="grid md:grid-cols-3 gap-4 mb-6">
-            <Card className="md:col-span-1 border-2 bg-white/90 backdrop-blur">
-              <CardHeader>
-                <div className="flex items-center gap-2 text-[#1e3a5f]">
-                  <MessageSquare className="w-4 h-4" />
-                  <p className="font-semibold">Chat</p>
-                </div>
-                <p className="text-sm text-gray-600">Jump into a private 1:1 chat to keep a thread going.</p>
-              </CardHeader>
-              <CardContent className="flex items-center gap-3">
-                <Button className="bg-[#1e3a5f] text-white hover:bg-[#2a4a6f] w-full" onClick={() => router.push('/messages')}>
-                  Open chats
-                </Button>
-              </CardContent>
-            </Card>
-            <div className="md:col-span-2">
+          <div className="mb-6">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
             <TabsList className="bg-white border">
               <TabsTrigger value="recent" className="data-[state=active]:bg-[#1e3a5f] data-[state=active]:text-white">
@@ -331,7 +316,6 @@ export default function ForumPage() {
               )}
             </TabsContent>
           </Tabs>
-            </div>
           </div>
         </div>
       </main>

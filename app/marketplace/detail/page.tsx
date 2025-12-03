@@ -238,6 +238,14 @@ export default function MarketplaceDetailPage() {
         setContactLoading(false);
         return;
       }
+    } else {
+      await supabase.from('conversation_participants').upsert(
+        [
+          { conversation_id: conversationId, user_id: userId },
+          { conversation_id: conversationId, user_id: sellerId },
+        ],
+        { onConflict: 'conversation_id,user_id' }
+      );
     }
 
     setContactLoading(false);

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { ArrowLeft, Send } from 'lucide-react';
+import { ArrowLeft, Send, MessageSquare } from 'lucide-react';
 import { Navigation } from '@/components/navigation';
 import { Footer } from '@/components/footer';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -19,6 +19,13 @@ type DisplayMessage = {
   author: string;
 };
 
+type ConversationSummary = {
+  id: string;
+  title: string;
+  lastMessage?: string;
+  lastAt?: string;
+};
+
 export default function ConversationPage() {
   const params = useSearchParams();
   const router = useRouter();
@@ -31,12 +38,76 @@ export default function ConversationPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [userId, setUserId] = useState<string | null>(null);
+  const [conversations, setConversations] = useState<ConversationSummary[]>([]);
+  const [conversationsLoading, setConversationsLoading] = useState(true);
   const channelRef = useRef<RealtimeChannel | null>(null);
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
   const scrollToBottom = () => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
+
+  useEffect(() => {
+    const loadConversations = async () => {
+      if (!supabase) {
+        setConversationsLoading(false);
+        return;
+      }
+      const { data: sessionData } = await supabase.auth.getSession();
+      const currentUserId = sessionData.session?.user?.id;
+      if (!currentUserId) {
+        setConversationsLoading(false);
+        return;
+      }
+
+      const { data: participantRows } = await supabase
+        .from('conversation_participants')
+        .select('conversation_id')
+        .eq('user_id', currentUserId);
+
+      const ids = participantRows?.map((p) => p.conversation_id) || [];
+      if (ids.length === 0) {
+        setConversations([]);
+        setConversationsLoading(false);
+        return;
+      }
+
+      const { data: convRows, error: convError } = await supabase
+        .from('conversations')
+        .select(
+          'id, updated_at, conversation_participants(user_id, profiles(full_name,email)), messages(body, created_at, sender_id)'
+        )
+        .in('id', ids)
+        .order('updated_at', { ascending: false });
+
+      if (convError) {
+        console.error('Conversation list error', convError);
+        setConversationsLoading(false);
+        return;
+      }
+
+      const mapped: ConversationSummary[] =
+        convRows?.map((c: any) => {
+          const others = (c.conversation_participants || []).filter((p: any) => p.user_id !== currentUserId);
+          const other =
+            others[0]?.profiles?.full_name || others[0]?.profiles?.email || 'Conversation';
+          const last = (c.messages || []).sort(
+            (a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+          )[0];
+          return {
+            id: c.id,
+            title: other,
+            lastMessage: last?.body,
+            lastAt: last?.created_at || c.updated_at,
+          };
+        }) || [];
+
+      setConversations(mapped);
+      setConversationsLoading(false);
+    };
+
+    loadConversations();
+  }, []);
 
   useEffect(() => {
     const load = async () => {
@@ -59,6 +130,12 @@ export default function ConversationPage() {
       }
       setUserId(currentUserId);
 
+      // Ensure current user is marked as a participant in case they were missing
+      await supabase.from('conversation_participants').upsert(
+        { conversation_id: conversationId, user_id: currentUserId },
+        { onConflict: 'conversation_id,user_id' }
+      );
+
       const { data: participantRows, error: participantsError } = await supabase
         .from('conversation_participants')
         .select('user_id, profiles(full_name,email)')
@@ -73,6 +150,9 @@ export default function ConversationPage() {
       const other = participantRows?.find((p) => p.user_id !== currentUserId);
       setOtherName(
         (other as any)?.profiles?.full_name || (other as any)?.profiles?.email || 'Conversation'
+      );
+      setConversations((prev) =>
+        prev.map((c) => (c.id === conversationId ? { ...c, title: (other as any)?.profiles?.full_name || (other as any)?.profiles?.email || c.title } : c))
       );
 
       const { data: messageRows, error: messagesError } = await supabase
@@ -194,6 +274,43 @@ export default function ConversationPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+              <div className="grid md:grid-cols-3 gap-4">
+                <div className="md:col-span-1 space-y-3">
+                  <div className="flex items-center gap-2 text-[#1e3a5f]">
+                    <MessageSquare className="w-4 h-4" />
+                    <span className="font-semibold">Conversations</span>
+                  </div>
+                  <div className="rounded-lg border border-gray-200 bg-white p-2 max-h-96 overflow-y-auto space-y-2">
+                    {conversationsLoading ? (
+                      <p className="text-sm text-gray-500">Loading...</p>
+                    ) : conversations.length === 0 ? (
+                      <p className="text-sm text-gray-500">No conversations yet.</p>
+                    ) : (
+                      conversations.map((conv) => (
+                        <button
+                          key={conv.id}
+                          onClick={() => router.push(`/messages?id=${conv.id}`)}
+                          className={`w-full text-left rounded-md px-3 py-2 border ${
+                            conv.id === conversationId ? 'border-[#1e3a5f] bg-[#1e3a5f]/5' : 'border-transparent hover:bg-gray-50'
+                          }`}
+                        >
+                          <p className="text-sm font-semibold text-[#1e3a5f]">{conv.title}</p>
+                          {conv.lastMessage && (
+                            <p className="text-xs text-gray-600 truncate">{conv.lastMessage}</p>
+                          )}
+                          {conv.lastAt && (
+                            <p className="text-[11px] text-gray-400 mt-1">
+                              {new Date(conv.lastAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}{' '}
+                              {new Date(conv.lastAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
+                            </p>
+                          )}
+                        </button>
+                      ))
+                    )}
+                  </div>
+                </div>
+
+                <div className="md:col-span-2 space-y-4">
               {loading && <p className="text-sm text-gray-600">Loading conversation...</p>}
               {error && (
                 <div className="text-sm text-red-700 bg-red-50 border border-red-200 px-3 py-2 rounded-md">{error}</div>
@@ -240,6 +357,8 @@ export default function ConversationPage() {
                   >
                     {sending ? 'Sending...' : <span className="flex items-center gap-2">Send <Send className="w-4 h-4" /></span>}
                   </Button>
+                </div>
+              </div>
                 </div>
               </div>
             </CardContent>

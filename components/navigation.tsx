@@ -98,6 +98,11 @@ export function Navigation() {
           <div className="flex items-center space-x-2">
             {isAuthed ? (
               <>
+                <Link href="/messages" aria-label="Messages">
+                  <Button variant="ghost" className="text-white hover:text-[#d4af37] hover:bg-[#2a4a6f] p-2">
+                    <MessageSquare className="w-5 h-5" />
+                  </Button>
+                </Link>
                 {isAdmin && (
                   <Link href="/admin/reports">
                     <Button

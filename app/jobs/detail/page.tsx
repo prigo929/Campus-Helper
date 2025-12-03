@@ -239,6 +239,15 @@ export default function JobDetailPage() {
         setContactLoading(false);
         return;
       }
+    } else {
+      // ensure both participants exist for existing conversation
+      await supabase.from('conversation_participants').upsert(
+        [
+          { conversation_id: conversationId, user_id: userId },
+          { conversation_id: conversationId, user_id: posterId },
+        ],
+        { onConflict: 'conversation_id,user_id' }
+      );
     }
 
     setContactLoading(false);
