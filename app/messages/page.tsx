@@ -40,6 +40,9 @@ export default function ConversationPage() {
   const [userId, setUserId] = useState<string | null>(null);
   const [conversations, setConversations] = useState<ConversationSummary[]>([]);
   const [conversationsLoading, setConversationsLoading] = useState(true);
+  const [newEmail, setNewEmail] = useState('');
+  const [startError, setStartError] = useState('');
+  const [startLoading, setStartLoading] = useState(false);
   const channelRef = useRef<RealtimeChannel | null>(null);
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
@@ -111,11 +114,6 @@ export default function ConversationPage() {
 
   useEffect(() => {
     const load = async () => {
-      if (!conversationId) {
-        setError('No conversation selected.');
-        setLoading(false);
-        return;
-      }
       if (!supabase) {
         setError('Supabase is not configured.');
         setLoading(false);
@@ -129,6 +127,11 @@ export default function ConversationPage() {
         return;
       }
       setUserId(currentUserId);
+
+      if (!conversationId) {
+        setLoading(false);
+        return;
+      }
 
       // Ensure current user is marked as a participant in case they were missing
       await supabase.from('conversation_participants').upsert(
@@ -246,6 +249,87 @@ export default function ConversationPage() {
     setSending(false);
   };
 
+  const startConversation = async () => {
+    setStartError('');
+    if (!supabase) {
+      setStartError('Supabase is not configured.');
+      return;
+    }
+    if (!newEmail.trim()) {
+      setStartError('Enter an email to start a chat.');
+      return;
+    }
+    const { data: sessionData } = await supabase.auth.getSession();
+    const currentUserId = sessionData.session?.user?.id;
+    if (!currentUserId) {
+      router.push('/sign-in');
+      return;
+    }
+    setStartLoading(true);
+    const targetEmail = newEmail.trim().toLowerCase();
+    const { data: targetProfile, error: profileError } = await supabase
+      .from('profiles')
+      .select('id, email, full_name')
+      .ilike('email', targetEmail)
+      .maybeSingle();
+    if (profileError || !targetProfile?.id) {
+      setStartError(profileError?.message || 'User not found with that email.');
+      setStartLoading(false);
+      return;
+    }
+    if (targetProfile.id === currentUserId) {
+      setStartError('You cannot start a chat with yourself.');
+      setStartLoading(false);
+      return;
+    }
+
+    // Check for existing conversation between both users
+    const { data: myConvs } = await supabase
+      .from('conversation_participants')
+      .select('conversation_id')
+      .eq('user_id', currentUserId);
+    const myIds = (myConvs || []).map((c) => c.conversation_id);
+    let conversationId = myIds[0] || null;
+    if (myIds.length > 0) {
+      const { data: shared } = await supabase
+        .from('conversation_participants')
+        .select('conversation_id')
+        .in('conversation_id', myIds)
+        .eq('user_id', targetProfile.id);
+      conversationId = shared?.[0]?.conversation_id || null;
+    }
+
+    if (!conversationId) {
+      const { data: newConv, error: convError } = await supabase
+        .from('conversations')
+        .insert({ started_by: currentUserId })
+        .select('id')
+        .single();
+      if (convError || !newConv?.id) {
+        setStartError(convError?.message || 'Could not start conversation.');
+        setStartLoading(false);
+        return;
+      }
+      conversationId = newConv.id;
+      await supabase.from('conversation_participants').insert([
+        { conversation_id: conversationId, user_id: currentUserId },
+        { conversation_id: conversationId, user_id: targetProfile.id },
+      ]);
+    } else {
+      await supabase.from('conversation_participants').upsert(
+        [
+          { conversation_id: conversationId, user_id: currentUserId },
+          { conversation_id: conversationId, user_id: targetProfile.id },
+        ],
+        { onConflict: 'conversation_id,user_id' }
+      );
+    }
+
+    setStartLoading(false);
+    setNewEmail('');
+    router.push(`/messages?id=${conversationId}`);
+  };
+
   const formatTime = (value?: string | null) =>
     value ? new Date(value).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) : '';
 
@@ -307,6 +391,25 @@ export default function ConversationPage() {
                         </button>
                       ))
                     )}
+                  </div>
+                  <div className="rounded-lg border border-dashed border-gray-300 bg-white p-3 space-y-2">
+                    <p className="text-sm font-semibold text-[#1e3a5f]">Start new chat</p>
+                    <Textarea
+                      placeholder="Enter campus email"
+                      value={newEmail}
+                      onChange={(e) => setNewEmail(e.target.value)}
+                      rows={2}
+                      className="text-sm"
+                    />
+                    {startError && <p className="text-xs text-red-600">{startError}</p>}
+                    <Button
+                      size="sm"
+                      className="bg-[#1e3a5f] text-white hover:bg-[#2a4a6f] w-full"
+                      onClick={startConversation}
+                      disabled={startLoading}
+                    >
+                      {startLoading ? 'Starting...' : 'Start conversation'}
+                    </Button>
                   </div>
                 </div>
 
