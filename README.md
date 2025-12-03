@@ -94,7 +94,7 @@ It is built as a university project but follows production-style architecture: *
 
 **Frontend / App**
 
-- [Next.js 14 (App Router)](https://nextjs.org/)
+- [Next.js 16 (App Router)](https://nextjs.org/)
 - [React](https://react.dev/)
 - [TypeScript](https://www.typescriptlang.org/)
 - [Tailwind CSS](https://tailwindcss.com/)
