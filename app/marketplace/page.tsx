@@ -276,10 +276,10 @@ export default function MarketplacePage() {
               return (
                 <Link href={`/marketplace/detail?id=${item.id}`} key={item.id}>
                   <Card
-                    className="hover:shadow-lg transition-all border-2 hover:border-[#d4af37] flex flex-col bg-white/90 backdrop-blur animate-fade-in-up"
+                    className="hover:shadow-lg transition-all border-2 hover:border-[#d4af37] flex flex-col bg-white/90 backdrop-blur animate-fade-in-up h-full"
                     style={{ animationDelay: `${index * 0.05}s` }}
                   >
-                    <CardContent className="p-6 flex-1">
+                    <CardContent className="p-6 flex-1 overflow-hidden">
                       <div className="flex items-start justify-between mb-4">
                         <div className="w-12 h-12 bg-[#f0f0f0] rounded-lg flex items-center justify-center">
                           <IconComponent className="w-6 h-6 text-[#1e3a5f]" />
@@ -289,8 +289,8 @@ export default function MarketplacePage() {
                         </Badge>
                       </div>
 
-                      <h3 className="text-lg font-bold text-[#1e3a5f] mb-2">{item.title}</h3>
-                      <p className="text-sm text-gray-600 mb-4 line-clamp-2">{item.description}</p>
+                      <h3 className="text-lg font-bold text-[#1e3a5f] mb-2 line-clamp-2">{item.title}</h3>
+                      <p className="text-sm text-gray-600 mb-4 line-clamp-3">{item.description}</p>
 
                       <div className="flex items-center justify-between mb-3">
                         <div className="text-2xl font-bold text-[#1e3a5f]">
