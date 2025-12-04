@@ -8,12 +8,18 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/lib/supabase';
 import type { Job, MarketplaceItem, ForumPost } from '@/lib/supabase';
 
 type SearchResults = {
   jobs: Job[];
   items: MarketplaceItem[];
   posts: ForumPost[];
+  meta?: {
+    usedServiceKey?: boolean;
+    warning?: string;
+    counts?: { jobs: number; items: number; posts: number };
+  };
 };
 
 const EMPTY_RESULTS: SearchResults = { jobs: [], items: [], posts: [] };
@@ -38,6 +44,19 @@ export default function SearchPage() {
   const [results, setResults] = useState<SearchResults>(EMPTY_RESULTS);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [authToken, setAuthToken] = useState<string | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    if (!supabase) return;
+    supabase.auth.getSession().then(({ data }) => {
+      if (!isMounted) return;
+      setAuthToken(data.session?.access_token ?? null);
+    });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   useEffect(() => {
     if (!query.trim()) {
@@ -51,14 +70,25 @@ export default function SearchPage() {
       try {
         setLoading(true);
         setError('');
+        const headers: Record<string, string> = {};
+        if (authToken) headers.Authorization = `Bearer ${authToken}`;
         const res = await fetch(`/api/search?q=${encodeURIComponent(query.trim())}`, {
           signal: controller.signal,
+          headers,
         });
         if (!res.ok) {
           throw new Error('Search failed');
         }
         const data = await res.json();
+        if (data.error) {
+          setError(typeof data.error === 'string' ? data.error : 'Unable to search right now.');
+          setResults(EMPTY_RESULTS);
+          return;
+        }
         setResults(data);
+        if (data.meta?.warning) {
+          setError(data.meta.warning);
+        }
       } catch (err: any) {
         if (err.name === 'AbortError') return;
         console.error('Search request failed', err);
@@ -73,7 +103,7 @@ export default function SearchPage() {
       controller.abort();
       clearTimeout(timeout);
     };
-  }, [query]);
+  }, [query, authToken]);
 
   const hasAnyResults = useMemo(
     () => results.jobs.length || results.items.length || results.posts.length,
