@@ -21,6 +21,8 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { supabase } from '@/lib/supabase';
 import { NotificationsDropdown } from '@/components/notifications-dropdown';
 import { getSafeSession } from '@/lib/get-safe-session';
+import Logo from '@/components/Logo';
+import { toast } from 'sonner';
 
 export function Navigation() {
   const router = useRouter();
@@ -78,6 +80,24 @@ export function Navigation() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!supabase) return;
+    const { data: listener } = supabase.auth.onAuthStateChange(async (event) => {
+      if (event === 'TOKEN_REFRESH_FAILED') {
+        toast.error('Your session expired. Please sign in again.');
+        await supabase.auth.signOut();
+        setIsAuthed(false);
+        setDisplayName('');
+        setEmail('');
+        setIsAdmin(false);
+      }
+    });
+
+    return () => {
+      listener?.subscription.unsubscribe();
+    };
+  }, []);
+
   const initials = useMemo(() => {
     const source = displayName || email || 'CH';
     return source
@@ -107,9 +127,7 @@ export function Navigation() {
         <div className="flex items-center gap-2 py-3">
           <div className="flex items-center space-x-2 flex-shrink-0">
             <Link href="/" className="flex items-center space-x-2">
-              <div className="w-8 h-8 min-w-[2rem] min-h-[2rem] shrink-0 bg-gradient-to-br from-[#d4af37] to-[#f4d03f] rounded-lg flex items-center justify-center font-bold text-[#1e3a5f]">
-                CH
-              </div>
+              <Logo className="w-10 h-10 min-w-[2.5rem] min-h-[2.5rem] shrink-0" />
               <span className="text-xl font-bold">Campus Helper</span>
             </Link>
             {isAdmin && (
