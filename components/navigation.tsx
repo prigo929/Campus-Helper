@@ -168,23 +168,23 @@ export function Navigation() {
                 <Link href="/messages" aria-label="Messages">
                   <Button
                     variant="ghost"
-                    size="icon"
-                    className="h-10 w-10 text-white hover:text-[#d4af37] hover:bg-[#2a4a6f]"
+                    className="h-10 px-3 text-white hover:text-[#d4af37] hover:bg-[#2a4a6f] flex items-center gap-2"
                   >
                     <MessageSquare className="w-5 h-5" />
+                    <span className="hidden md:inline">Messages</span>
                   </Button>
                 </Link>
                 <Link href="/profile">
                   <Button
                     variant="ghost"
-                    className="text-white hover:text-[#d4af37] hover:bg-[#2a4a6f] flex items-center gap-2 h-10 px-2"
+                    className="text-white hover:text-[#d4af37] hover:bg-[#2a4a6f] flex items-center gap-2 h-10 px-3"
                   >
                     <Avatar className="h-8 w-8 border border-white/20 bg-white/10">
                       <AvatarFallback className="bg-[#d4af37] text-[#1e3a5f] text-xs font-semibold">
                         {initials}
                       </AvatarFallback>
                     </Avatar>
-                    <span className="hidden sm:inline">{displayName || 'Profile'}</span>
+                    <span className="hidden md:inline">{displayName || 'Profile'}</span>
                   </Button>
                 </Link>
                 <Button
