@@ -165,8 +165,7 @@ export function Navigation() {
             {isAuthed ? (
               <>
                 <NotificationsDropdown />
-                <Link href="/messages" aria-label="Messages">
-                  <Button
+                <Link href="/messages" aria-label="Messages" className="hidden sm:inline-flex">                  <Button
                     variant="ghost"
                     size="icon"
                     className="h-10 w-10 text-white hover:text-[#d4af37] hover:bg-[#2a4a6f]"
