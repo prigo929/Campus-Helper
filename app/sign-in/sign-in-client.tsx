@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/lib/supabase';
 import { ensureProfileExists } from '@/lib/profile';
+import { getSafeSession } from '@/lib/get-safe-session';
 
 export default function SignInClient() {
   const router = useRouter();
@@ -80,7 +81,7 @@ export default function SignInClient() {
       return;
     }
 
-    const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+    const { session, error: sessionError } = await getSafeSession();
 
     if (sessionError) {
       setError(sessionError.message);
@@ -89,7 +90,7 @@ export default function SignInClient() {
     }
 
     try {
-      await ensureProfileExists(supabase, sessionData.session, { email: email.trim() });
+      await ensureProfileExists(supabase, session, { email: email.trim() });
     } catch (profileError) {
       console.error('Profile setup failed after sign-in', profileError);
       setError('Signed in, but we could not load your profile. Try again.');

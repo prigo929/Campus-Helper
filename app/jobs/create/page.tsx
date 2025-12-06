@@ -14,6 +14,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/lib/supabase';
 import { ensureProfileExists } from '@/lib/profile';
 import type { Session } from '@supabase/supabase-js';
+import { getSafeSession } from '@/lib/get-safe-session';
 
 const categories = ['Tutoring', 'Research', 'Campus Tasks', 'Events', 'Tech', 'Other'];
 const payTypes = ['hourly', 'fixed', 'negotiable'] as const;
@@ -41,22 +42,22 @@ export default function CreateJobPage() {
     if (!supabase) return;
     let active = true;
 
-    supabase.auth.getSession().then(async ({ data, error: sessionError }) => {
+    getSafeSession().then(async ({ session, error: sessionError }) => {
       if (!active) return;
       if (sessionError) {
         setError(sessionError.message);
         setCheckingSession(false);
         return;
       }
-      if (!data.session?.user) {
+      if (!session?.user) {
         setError('Please sign in to post a job.');
         router.push('/sign-in');
         setCheckingSession(false);
         return;
       }
-      setSession(data.session);
+      setSession(session);
       try {
-        await ensureProfileExists(supabase, data.session);
+        await ensureProfileExists(supabase, session);
       } catch (profileError) {
         console.error('Profile auto-create failed', profileError);
       }

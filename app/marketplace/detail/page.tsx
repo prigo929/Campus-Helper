@@ -14,6 +14,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { supabase, type MarketplaceItem } from '@/lib/supabase';
 import type { Rating } from '@/lib/supabase';
+import { getSafeSession } from '@/lib/get-safe-session';
 import {
   Dialog,
   DialogContent,
@@ -79,8 +80,8 @@ function MarketplaceDetailContent() {
       setReportError('Supabase is not configured.');
       return;
     }
-    const { data: sessionData } = await supabase.auth.getSession();
-    const reporterId = sessionData.session?.user?.id;
+    const { session } = await getSafeSession();
+    const reporterId = session?.user?.id;
     if (!reporterId) {
       setReportError('Please sign in to report.');
       return;
@@ -119,8 +120,11 @@ function MarketplaceDetailContent() {
       }
 
       setLoading(true);
-      const { data: sessionData } = await supabase.auth.getSession();
-      if (!sessionData.session) {
+      const { session, error: sessionError } = await getSafeSession({ silent: true });
+      if (sessionError) {
+        console.error('Failed to load marketplace detail session', sessionError);
+      }
+      if (!session) {
         setItem(fallbackItem);
         setLoading(false);
         return;
@@ -182,8 +186,8 @@ function MarketplaceDetailContent() {
       return;
     }
     setContactLoading(true);
-    const { data: sessionData } = await supabase.auth.getSession();
-    const userId = sessionData.session?.user?.id;
+    const { session } = await getSafeSession();
+    const userId = session?.user?.id;
     if (!userId) {
       router.push('/sign-in');
       setContactLoading(false);
@@ -488,8 +492,8 @@ function MarketplaceDetailContent() {
                         }
 
                         setSubmitting(true);
-                        const { data: sessionData } = await supabase.auth.getSession();
-                        const userId = sessionData.session?.user?.id;
+                        const { session } = await getSafeSession();
+                        const userId = session?.user?.id;
                         if (!userId) {
                           setSubmitError('Please sign in to leave a review.');
                           setSubmitting(false);

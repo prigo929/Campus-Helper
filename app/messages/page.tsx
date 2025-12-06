@@ -11,6 +11,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/lib/supabase';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import { Input } from '@/components/ui/input';
+import { toast } from 'sonner';
+import { getSafeSession } from '@/lib/get-safe-session';
 
 type DisplayMessage = {
   id: string;
@@ -60,8 +62,13 @@ function ConversationPageContent() {
   const [startLoading, setStartLoading] = useState(false);
   const [searchResults, setSearchResults] = useState<TargetProfile[]>([]);
   const [searchLoading, setSearchLoading] = useState(false);
+  const [currentUserName, setCurrentUserName] = useState('You');
+  const [typingUser, setTypingUser] = useState<string | null>(null);
   const channelRef = useRef<RealtimeChannel | null>(null);
   const bottomRef = useRef<HTMLDivElement | null>(null);
+  const typingIndicatorTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const typingBroadcastTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const lastTypingBroadcastRef = useRef<number>(0);
   const handleBack = () => {
     if (conversationId) {
       router.push('/messages');
@@ -85,13 +92,55 @@ function ConversationPageContent() {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const sendTypingSignal = (isTyping: boolean) => {
+    if (!conversationId || !channelRef.current || !userId) return;
+    channelRef.current.send({
+      type: 'broadcast',
+      event: 'typing',
+      payload: {
+        userId,
+        name: currentUserName || 'Someone',
+        isTyping,
+      },
+    });
+  };
+
+  const handleMessageChange = (value: string) => {
+    setMessage(value);
+    if (!conversationId || !channelRef.current || !userId) return;
+    if (!value.trim()) {
+      sendTypingSignal(false);
+      if (typingBroadcastTimeoutRef.current) {
+        clearTimeout(typingBroadcastTimeoutRef.current);
+        typingBroadcastTimeoutRef.current = null;
+      }
+      return;
+    }
+
+    const now = Date.now();
+    if (now - lastTypingBroadcastRef.current > 900) {
+      sendTypingSignal(true);
+      lastTypingBroadcastRef.current = now;
+    }
+
+    if (typingBroadcastTimeoutRef.current) {
+      clearTimeout(typingBroadcastTimeoutRef.current);
+    }
+    typingBroadcastTimeoutRef.current = setTimeout(() => {
+      sendTypingSignal(false);
+    }, 1400);
+  };
+
   const loadConversations = async () => {
     if (!supabase) {
       setConversationsLoading(false);
       return;
     }
-    const { data: sessionData } = await supabase.auth.getSession();
-    const currentUserId = sessionData.session?.user?.id;
+    const { session, error: sessionError } = await getSafeSession({ silent: true });
+    if (sessionError) {
+      console.error('Failed to load conversations session', sessionError);
+    }
+    const currentUserId = session?.user?.id;
     if (!currentUserId) {
       setConversationsLoading(false);
       return;
@@ -171,8 +220,8 @@ function ConversationPageContent() {
         setSearchLoading(false);
         return;
       }
-      const { data: sessionData } = await supabase.auth.getSession();
-      const currentUserId = sessionData.session?.user?.id;
+      const { session } = await getSafeSession({ silent: true });
+      const currentUserId = session?.user?.id;
       if (!currentUserId) return;
       setSearchLoading(true);
       const isUuid = /^[0-9a-f-]{8}-[0-9a-f-]{4}-[0-9a-f-]{4}-[0-9a-f-]{4}-[0-9a-f-]{12}$/i.test(query);
@@ -204,11 +253,15 @@ function ConversationPageContent() {
     if (!supabase) {
       setError('Supabase is not configured.');
       setLoading(false);
+      toast.error('Supabase is not configured.');
       return;
     }
 
-      const { data: sessionData } = await supabase.auth.getSession();
-      const currentUserId = sessionData.session?.user?.id;
+      const { session, error: sessionError } = await getSafeSession();
+      const currentUserId = session?.user?.id;
+      if (sessionError) {
+        console.error('Failed to load chat session', sessionError);
+      }
       if (!currentUserId) {
         router.push('/sign-in');
         return;
@@ -235,10 +288,15 @@ function ConversationPageContent() {
       if (participantsError) {
         setError(participantsError.message);
         setLoading(false);
+        toast.error('Could not load the participants for this chat.');
         return;
       }
 
       const other = participantRows?.find((p) => p.user_id !== currentUserId);
+      const me = participantRows?.find((p) => p.user_id === currentUserId);
+      setCurrentUserName(
+        (me as any)?.profiles?.full_name || (me as any)?.profiles?.email || 'You'
+      );
       const resolvedName =
         (other as any)?.profiles?.full_name || (other as any)?.profiles?.email || 'Conversation';
       setOtherName(resolvedName);
@@ -252,6 +310,7 @@ function ConversationPageContent() {
       if (messagesError) {
         setError(messagesError.message);
         setLoading(false);
+        toast.error('Could not load messages for this conversation.');
         return;
       }
 
@@ -268,7 +327,11 @@ function ConversationPageContent() {
 
       if (!channelRef.current) {
         channelRef.current = supabase
-          .channel(`conversation-${conversationId}`)
+          .channel(`conversation-${conversationId}`, {
+            config: {
+              broadcast: { self: true },
+            },
+          })
           .on(
             'postgres_changes',
             { event: 'INSERT', schema: 'public', table: 'messages', filter: `conversation_id=eq.${conversationId}` },
@@ -291,6 +354,24 @@ function ConversationPageContent() {
               scrollToBottom();
             }
           )
+          .on('broadcast', { event: 'typing' }, (payload) => {
+            const typingPayload = payload.payload as { userId?: string; name?: string; isTyping?: boolean };
+            if (!typingPayload?.userId || typingPayload.userId === currentUserId) return;
+
+            if (typingPayload.isTyping) {
+              setTypingUser(typingPayload.name || 'Someone');
+              if (typingIndicatorTimeoutRef.current) {
+                clearTimeout(typingIndicatorTimeoutRef.current);
+              }
+              typingIndicatorTimeoutRef.current = setTimeout(() => setTypingUser(null), 2200);
+            } else {
+              if (typingIndicatorTimeoutRef.current) {
+                clearTimeout(typingIndicatorTimeoutRef.current);
+                typingIndicatorTimeoutRef.current = null;
+              }
+              setTypingUser(null);
+            }
+          })
           .subscribe();
       }
     };
@@ -302,6 +383,16 @@ function ConversationPageContent() {
         supabase?.removeChannel(channelRef.current);
         channelRef.current = null;
       }
+      if (typingIndicatorTimeoutRef.current) {
+        clearTimeout(typingIndicatorTimeoutRef.current);
+        typingIndicatorTimeoutRef.current = null;
+      }
+      if (typingBroadcastTimeoutRef.current) {
+        clearTimeout(typingBroadcastTimeoutRef.current);
+        typingBroadcastTimeoutRef.current = null;
+      }
+      lastTypingBroadcastRef.current = 0;
+      setTypingUser(null);
     };
   }, [conversationId, router]);
 
@@ -314,10 +405,12 @@ function ConversationPageContent() {
   const sendMessage = async () => {
     if (!supabase) {
       setError('Supabase is not configured.');
+      toast.error('Supabase is not configured.');
       return;
     }
     if (!userId) {
       setError('Please sign in to send messages.');
+      toast.error('Please sign in to send messages.');
       return;
     }
     if (!message.trim() || !conversationId) return;
@@ -330,8 +423,14 @@ function ConversationPageContent() {
     if (insertError) {
       setError(insertError.message);
       setSending(false);
+      toast.error(insertError.message || 'Could not send your message.');
       return;
     }
+    if (typingBroadcastTimeoutRef.current) {
+      clearTimeout(typingBroadcastTimeoutRef.current);
+      typingBroadcastTimeoutRef.current = null;
+    }
+    sendTypingSignal(false);
     setMessages((prev) => [
       ...prev,
       {
@@ -349,12 +448,14 @@ function ConversationPageContent() {
     );
     setMessage('');
     setSending(false);
+    toast.success('Message sent', { id: 'message-status' });
   };
 
   const startConversation = async (profileOverride?: TargetProfile) => {
     setStartError('');
     if (!supabase) {
       setStartError('Supabase is not configured.');
+      toast.error('Supabase is not configured.');
       return;
     }
     const rawInput = newEmail.trim();
@@ -362,8 +463,8 @@ function ConversationPageContent() {
       setStartError('Enter an email, name, or ID to start a chat.');
       return;
     }
-    const { data: sessionData } = await supabase.auth.getSession();
-    const currentUserId = sessionData.session?.user?.id;
+    const { session } = await getSafeSession();
+    const currentUserId = session?.user?.id;
     if (!currentUserId) {
       router.push('/sign-in');
       return;
@@ -387,6 +488,7 @@ function ConversationPageContent() {
       if (profileError || !fetched?.id) {
         setStartError(profileError?.message || 'User not found with that contact info.');
         setStartLoading(false);
+        toast.error(profileError?.message || 'User not found with that contact info.');
         return;
       }
       targetProfile = fetched;
@@ -395,6 +497,7 @@ function ConversationPageContent() {
     if (targetProfile.id === currentUserId) {
       setStartError('You cannot start a chat with yourself.');
       setStartLoading(false);
+      toast.error('You cannot start a chat with yourself.');
       return;
     }
 
@@ -423,6 +526,7 @@ function ConversationPageContent() {
       if (convError || !newConv?.id) {
         setStartError(convError?.message || 'Could not start conversation.');
         setStartLoading(false);
+        toast.error(convError?.message || 'Could not start conversation.');
         return;
       }
       conversationId = newConv.id;
@@ -449,6 +553,7 @@ function ConversationPageContent() {
     ]);
     loadConversations();
     router.push(`/messages?id=${conversationId}`);
+    toast.success('Conversation ready', { description: 'Start sending your first message.' });
   };
 
   const formatTime = (value?: string | null) =>
@@ -581,6 +686,12 @@ function ConversationPageContent() {
                             );
                           })
                         )}
+                        {typingUser && (
+                          <div className="flex items-center gap-2 text-xs text-gray-600 pl-1">
+                            <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+                            <span>{typingUser} is typing...</span>
+                          </div>
+                        )}
                         <div ref={bottomRef} />
                       </div>
 
@@ -588,7 +699,7 @@ function ConversationPageContent() {
                         <Textarea
                           placeholder="Write a message..."
                           value={message}
-                          onChange={(e) => setMessage(e.target.value)}
+                          onChange={(e) => handleMessageChange(e.target.value)}
                           rows={3}
                           disabled={sending}
                         />

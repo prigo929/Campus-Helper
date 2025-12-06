@@ -13,6 +13,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/lib/supabase';
 import { ensureProfileExists } from '@/lib/profile';
 import type { Session } from '@supabase/supabase-js';
+import { getSafeSession } from '@/lib/get-safe-session';
 
 export default function EditProfilePage() {
   const router = useRouter();
@@ -40,7 +41,7 @@ export default function EditProfilePage() {
     let active = true;
 
     const loadProfile = async () => {
-      const { data, error: sessionError } = await client.auth.getSession();
+      const { session, error: sessionError } = await getSafeSession();
       if (!active) return;
       if (sessionError) {
         setError(sessionError.message);
@@ -49,7 +50,7 @@ export default function EditProfilePage() {
         return;
       }
 
-      if (!data.session?.user) {
+      if (!session?.user) {
         setError('Please sign in to edit your profile.');
         setCheckingSession(false);
         setLoadingProfile(false);
@@ -57,9 +58,9 @@ export default function EditProfilePage() {
         return;
       }
 
-      setSession(data.session);
+      setSession(session);
       try {
-        await ensureProfileExists(client, data.session);
+        await ensureProfileExists(client, session);
       } catch (profileError) {
         console.error('Profile auto-create failed', profileError);
       }
@@ -67,14 +68,14 @@ export default function EditProfilePage() {
       const { data: profileData, error: profileError } = await client
         .from('profiles')
         .select('email, full_name, university, major, year, bio')
-        .eq('id', data.session.user.id)
+        .eq('id', session.user.id)
         .single();
 
       if (profileError) {
         setError(profileError.message);
       } else if (profileData) {
         setFullName(profileData.full_name || '');
-        setEmail(profileData.email || data.session.user.email || '');
+        setEmail(profileData.email || session.user.email || '');
         setUniversity(profileData.university || '');
         setMajor(profileData.major || '');
         setYear(profileData.year || '');

@@ -19,6 +19,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
+import { getSafeSession } from '@/lib/get-safe-session';
 
 const fallbackPost: ForumPost = {
   id: 'demo',
@@ -170,8 +171,10 @@ function ForumDetailPageContent() {
       }
 
       setLoading(true);
-      const { data: sessionData } = await client.auth.getSession();
-      const session = sessionData.session;
+      const { session, error: sessionError } = await getSafeSession({ silent: true });
+      if (sessionError) {
+        console.error('Failed to load forum post session', sessionError);
+      }
       setHasSession(Boolean(session));
       if (!session) {
         setPost(fallbackPost);
@@ -236,8 +239,8 @@ function ForumDetailPageContent() {
       return;
     }
     setReplying(true);
-    const { data: sessionData } = await client.auth.getSession();
-    const userId = sessionData.session?.user?.id;
+    const { session } = await getSafeSession();
+    const userId = session?.user?.id;
     if (!userId) {
       setReplyError('Please sign in to reply.');
       setReplying(false);
@@ -297,8 +300,8 @@ function ForumDetailPageContent() {
                 onClick={async () => {
                   setCommentReportMessage('');
                   if (!supabase || !post?.id) return;
-                  const { data: sessionData } = await supabase.auth.getSession();
-                  const reporterId = sessionData.session?.user?.id;
+                  const { session } = await getSafeSession();
+                  const reporterId = session?.user?.id;
                   if (!reporterId) {
                     setCommentReportMessage('Sign in to report comments.');
                     return;

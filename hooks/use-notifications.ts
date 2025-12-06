@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { supabase, type Notification } from '@/lib/supabase';
+import { toast } from 'sonner';
+import { getSafeSession } from '@/lib/get-safe-session';
 
 export type NotificationType = Notification['type'];
 
@@ -48,16 +50,20 @@ export function useNotifications() {
       if (!supabase) {
         setNotifications(SEED_NOTIFICATIONS);
         setLoading(false);
+        toast.error('Supabase is not configured. Showing sample notifications.');
         return;
       }
 
-      const { data: sessionData } = await supabase.auth.getSession();
-      const session = sessionData.session;
+      const { session, error: sessionError } = await getSafeSession({ silent: true });
 
       if (!session) {
         setNotifications(SEED_NOTIFICATIONS);
         setLoading(false);
         return;
+      }
+
+      if (sessionError) {
+        console.error('Failed to load auth session for notifications', sessionError);
       }
 
       const { data, error } = await supabase
@@ -72,6 +78,7 @@ export function useNotifications() {
       if (error) {
         console.error('Failed to load notifications', error);
         setNotifications(SEED_NOTIFICATIONS);
+        toast.error('Could not load your notifications. Showing recent sample alerts.');
       } else {
         setNotifications(data || []);
       }
@@ -101,13 +108,13 @@ export function useNotifications() {
     setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)));
 
     if (!supabase) return;
-    const { data: sessionData } = await supabase.auth.getSession();
-    const session = sessionData.session;
+    const { session } = await getSafeSession({ silent: true });
     if (!session) return;
 
     const { error } = await supabase.from('notifications').update({ read: true }).eq('id', id).eq('user_id', session.user.id);
     if (error) {
       console.error('Failed to mark notification read', error);
+      toast.error('Could not update that notification.');
     }
   };
 
@@ -115,13 +122,15 @@ export function useNotifications() {
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
 
     if (!supabase) return;
-    const { data: sessionData } = await supabase.auth.getSession();
-    const session = sessionData.session;
+    const { session } = await getSafeSession({ silent: true });
     if (!session) return;
 
     const { error } = await supabase.from('notifications').update({ read: true }).eq('user_id', session.user.id);
     if (error) {
       console.error('Failed to mark all notifications read', error);
+      toast.error('Could not mark all notifications as read.');
+    } else {
+      toast.success('All notifications marked as read.');
     }
   };
 

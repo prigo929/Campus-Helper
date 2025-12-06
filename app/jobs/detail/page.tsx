@@ -22,6 +22,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
+import { getSafeSession } from '@/lib/get-safe-session';
 
 const fallbackJob: Job = {
   id: 'demo',
@@ -79,8 +80,8 @@ function JobDetailContent() {
       setReportError('Supabase is not configured.');
       return;
     }
-    const { data: sessionData } = await supabase.auth.getSession();
-    const reporterId = sessionData.session?.user?.id;
+    const { session } = await getSafeSession();
+    const reporterId = session?.user?.id;
     if (!reporterId) {
       setReportError('Please sign in to report.');
       return;
@@ -119,8 +120,11 @@ function JobDetailContent() {
       }
 
       setLoading(true);
-      const { data: sessionData } = await supabase.auth.getSession();
-      if (!sessionData.session) {
+      const { session, error: sessionError } = await getSafeSession({ silent: true });
+      if (sessionError) {
+        console.error('Failed to load job detail session', sessionError);
+      }
+      if (!session) {
         setJob(fallbackJob);
         setLoading(false);
         return;
@@ -182,8 +186,8 @@ function JobDetailContent() {
       return;
     }
     setContactLoading(true);
-    const { data: sessionData } = await supabase.auth.getSession();
-    const userId = sessionData.session?.user?.id;
+    const { session } = await getSafeSession();
+    const userId = session?.user?.id;
     if (!userId) {
       router.push('/sign-in');
       setContactLoading(false);
@@ -498,8 +502,8 @@ function JobDetailContent() {
                         }
 
                         setSubmitting(true);
-                        const { data: sessionData } = await supabase.auth.getSession();
-                        const userId = sessionData.session?.user?.id;
+                        const { session } = await getSafeSession();
+                        const userId = session?.user?.id;
                         if (!userId) {
                           setSubmitError('Please sign in to leave a review.');
                           setSubmitting(false);

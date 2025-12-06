@@ -20,6 +20,7 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { supabase } from '@/lib/supabase';
 import { NotificationsDropdown } from '@/components/notifications-dropdown';
+import { getSafeSession } from '@/lib/get-safe-session';
 
 export function Navigation() {
   const router = useRouter();
@@ -37,11 +38,14 @@ export function Navigation() {
       if (!supabase) return;
 
       setLoading(true);
-      const { data } = await supabase.auth.getSession();
+      const { session, error } = await getSafeSession({ silent: true });
       if (!isMounted) return;
 
-      const session = data.session;
       setIsAuthed(Boolean(session));
+
+      if (error) {
+        console.error('Failed to load auth session', error);
+      }
 
       if (!session?.user) {
         setDisplayName('');

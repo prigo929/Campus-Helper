@@ -12,6 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase, type Job } from '@/lib/supabase';
+import { getSafeSession } from '@/lib/get-safe-session';
 
 const categories = ['All', 'Tutoring', 'Research', 'Campus Tasks', 'Events', 'Tech', 'Other'];
 
@@ -107,8 +108,11 @@ export default function JobsPage() {
 
       setLoading(true);
 
-      const { data: sessionData } = await supabase.auth.getSession();
-      if (!sessionData.session) {
+      const { session, error: sessionError } = await getSafeSession({ silent: true });
+      if (sessionError) {
+        console.error('Failed to load jobs session', sessionError);
+      }
+      if (!session) {
         setJobs(sampleJobs);
         setLoading(false);
         return;

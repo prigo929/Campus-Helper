@@ -23,6 +23,7 @@ import {
 } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { getSafeSession } from '@/lib/get-safe-session';
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -53,15 +54,13 @@ export default function ProfilePage() {
       setLoading(true);
       setError('');
 
-      const { data: sessionData, error: sessionError } = await client.auth.getSession();
+      const { session, error: sessionError } = await getSafeSession();
 
       if (sessionError) {
         setError(sessionError.message);
         setLoading(false);
         return;
       }
-
-      const session = sessionData.session;
 
       if (!session?.user) {
         setError('Please sign in to view your profile.');

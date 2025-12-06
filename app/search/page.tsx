@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
 import type { Job, MarketplaceItem, ForumPost } from '@/lib/supabase';
+import { getSafeSession } from '@/lib/get-safe-session';
 
 type SearchResults = {
   jobs: Job[];
@@ -59,9 +60,9 @@ export default function SearchPage() {
   useEffect(() => {
     let isMounted = true;
     if (!supabase) return;
-    supabase.auth.getSession().then(({ data }) => {
+    getSafeSession({ silent: true }).then(({ session }) => {
       if (!isMounted) return;
-      setAuthToken(data.session?.access_token ?? null);
+      setAuthToken(session?.access_token ?? null);
     });
     return () => {
       isMounted = false;

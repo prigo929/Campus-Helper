@@ -13,6 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase, type ForumPost } from '@/lib/supabase';
+import { getSafeSession } from '@/lib/get-safe-session';
 
 const categories = ['All', 'General', 'Academic', 'Events', 'Housing', 'Other'];
 
@@ -138,8 +139,11 @@ export default function ForumPage() {
 
       setLoading(true);
 
-      const { data: sessionData } = await supabase.auth.getSession();
-      if (!sessionData.session) {
+      const { session, error: sessionError } = await getSafeSession({ silent: true });
+      if (sessionError) {
+        console.error('Failed to load forum session', sessionError);
+      }
+      if (!session) {
         setPosts(samplePosts);
         setLoading(false);
         return;

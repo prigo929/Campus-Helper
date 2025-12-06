@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/lib/supabase';
+import { getSafeSession } from '@/lib/get-safe-session';
 
 type Report = {
   id: string;
@@ -154,8 +155,11 @@ export default function AdminReportsPage() {
         return;
       }
 
-      const { data: sessionData } = await supabase.auth.getSession();
-      const isAdmin = sessionData.session?.user?.user_metadata?.role === 'admin';
+      const { session, error: sessionError } = await getSafeSession();
+      if (sessionError) {
+        console.error('Failed to load admin session', sessionError);
+      }
+      const isAdmin = session?.user?.user_metadata?.role === 'admin';
       if (!isAdmin) {
         setError('You must be an admin to view this page.');
         setLoading(false);

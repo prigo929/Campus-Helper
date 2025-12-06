@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
+import { getSafeSession } from '@/lib/get-safe-session';
 
 type AuthState = {
   isAuthed: boolean;
@@ -21,7 +22,7 @@ export function useAuthStatus(): AuthState {
     let active = true;
 
     const resolveSession = async () => {
-      const { data, error } = await client.auth.getSession();
+      const { session, error } = await getSafeSession({ silent: true });
 
       if (!active) return;
 
@@ -29,7 +30,7 @@ export function useAuthStatus(): AuthState {
         console.error('Failed to load auth session', error);
       }
 
-      setState({ isAuthed: Boolean(data.session), loading: false });
+      setState({ isAuthed: Boolean(session), loading: false });
     };
 
     resolveSession();
