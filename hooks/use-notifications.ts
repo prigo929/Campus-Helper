@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { supabase, type Notification } from '@/lib/supabase';
 import { toast } from 'sonner';
 import { getSafeSession } from '@/lib/get-safe-session';
+import type { RealtimeChannel } from '@supabase/supabase-js';
 
 export type NotificationType = Notification['type'];
 
@@ -42,9 +43,11 @@ const SEED_NOTIFICATIONS: Notification[] = [
 export function useNotifications() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
+  const [sessionUserId, setSessionUserId] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
+    let channel: RealtimeChannel | null = null;
 
     const load = async () => {
       if (!supabase) {
@@ -65,6 +68,7 @@ export function useNotifications() {
       if (sessionError) {
         console.error('Failed to load auth session for notifications', sessionError);
       }
+      setSessionUserId(session.user.id);
 
       const { data, error } = await supabase
         .from('notifications')
@@ -89,8 +93,34 @@ export function useNotifications() {
 
     return () => {
       active = false;
+      if (channel) {
+        supabase?.removeChannel(channel);
+      }
     };
   }, []);
+
+  useEffect(() => {
+    if (!supabase || !sessionUserId) return;
+
+    const channel = supabase
+      .channel(`notifications-${sessionUserId}`)
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${sessionUserId}` },
+        (payload) => {
+          const notification = payload.new as Notification;
+          setNotifications((prev) => {
+            if (prev.find((n) => n.id === notification.id)) return prev;
+            return [notification, ...prev].slice(0, 50);
+          });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [sessionUserId]);
 
   useEffect(() => {
     try {

@@ -442,12 +442,13 @@ function ConversationPageContent() {
     }
     if (!message.trim() || !conversationId) return;
     setSending(true);
+    const trimmedBody = message.trim();
     const { data: inserted, error: insertError } = await supabase
       .from('messages')
       .insert({
         conversation_id: conversationId,
         sender_id: userId,
-        body: message.trim(),
+        body: trimmedBody,
       })
       .select('id, body, sender_id, created_at, profiles(full_name,email)')
       .maybeSingle();
@@ -486,7 +487,7 @@ function ConversationPageContent() {
     });
     setConversations((prev) =>
       prev.map((c) =>
-        c.id === conversationId ? { ...c, lastMessage: message.trim(), lastAt: new Date().toISOString() } : c
+        c.id === conversationId ? { ...c, lastMessage: trimmedBody, lastAt: new Date().toISOString() } : c
       )
     );
     if (channelRef.current) {
