@@ -5,7 +5,7 @@ const Logo = ({ className = "w-10 h-10" }) => {
     <svg 
       xmlns="http://www.w3.org/2000/svg" 
       viewBox="0 0 200 200" 
-      className={className} // This allows you to control size with Tailwind
+      className={className} 
       fill="none"
     >
       <defs>
