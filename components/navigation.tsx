@@ -100,8 +100,8 @@ export function Navigation() {
   return (
     <nav className="bg-[#1e3a5f] text-white shadow-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-        <div className="flex flex-wrap items-center gap-2 py-3">
-          <div className="flex items-center space-x-2 w-full sm:w-auto sm:flex-1 sm:min-w-0 lg:flex-1 lg:min-w-0">
+        <div className="flex items-center gap-2 py-3">
+          <div className="flex items-center space-x-2 flex-shrink-0">
             <Link href="/" className="flex items-center space-x-2">
               <div className="w-8 h-8 min-w-[2rem] min-h-[2rem] shrink-0 bg-gradient-to-br from-[#d4af37] to-[#f4d03f] rounded-lg flex items-center justify-center font-bold text-[#1e3a5f]">
                 CH
@@ -121,7 +121,7 @@ export function Navigation() {
             )}
           </div>
 
-          <div className="hidden lg:flex items-center space-x-1 justify-center flex-shrink-0">
+          <div className="hidden lg:flex items-center space-x-1 justify-center flex-1 min-w-0">
             <Link href="/jobs">
               <Button variant="ghost" className="text-white hover:text-[#d4af37] hover:bg-[#2a4a6f]">
                 <Briefcase className="w-4 h-4 mr-2" />
@@ -161,7 +161,7 @@ export function Navigation() {
             </Link>
           </div>
 
-          <div className="flex items-center gap-2 justify-end w-full sm:w-auto sm:flex-1 sm:min-w-0 lg:flex-1 lg:min-w-0">
+          <div className="flex items-center gap-2 justify-end ml-auto flex-shrink-0">
             {isAuthed ? (
               <>
                 <NotificationsDropdown />
@@ -255,6 +255,22 @@ export function Navigation() {
                   AI
                 </Button>
               </Link>
+              {isAuthed && (
+                <Link href="/messages" onClick={() => setMobileOpen(false)}>
+                  <Button variant="ghost" className="w-full justify-center bg-white/10 text-white">
+                    <MessageSquare className="w-4 h-4 mr-2" />
+                    Messages
+                  </Button>
+                </Link>
+              )}
+              {isAdmin && (
+                <Link href="/admin/reports" onClick={() => setMobileOpen(false)}>
+                  <Button className="w-full justify-center bg-white text-[#1e3a5f]">
+                    <Shield className="w-4 h-4 mr-2" />
+                    Admin
+                  </Button>
+                </Link>
+              )}
               {isAuthed ? (
                 <Button
                   className="w-full justify-center bg-white text-[#1e3a5f]"
