@@ -339,7 +339,10 @@ function ConversationPageContent() {
               const newMessage = payload.new as any;
               setMessages((prev) => {
                 if (prev.find((m) => m.id === newMessage.id)) return prev;
-                const author = newMessage.profiles?.full_name || newMessage.profiles?.email || 'Campus Helper user';
+                const author =
+                  newMessage.sender_id === currentUserId
+                    ? 'You'
+                    : newMessage.profiles?.full_name || newMessage.profiles?.email || 'Campus Helper user';
                 return [
                   ...prev,
                   {
@@ -351,9 +354,33 @@ function ConversationPageContent() {
                   },
                 ];
               });
+              setConversations((prev) =>
+                prev.map((c) =>
+                  c.id === conversationId
+                    ? { ...c, lastMessage: newMessage.body, lastAt: newMessage.created_at }
+                    : c
+                )
+              );
               scrollToBottom();
             }
           )
+          .on('broadcast', { event: 'new-message' }, (payload) => {
+            const newMessage = payload.payload as DisplayMessage | undefined;
+            if (!newMessage || !newMessage.id) return;
+            setTypingUser(null);
+            setMessages((prev) => {
+              if (prev.find((m) => m.id === newMessage.id)) return prev;
+              return [...prev, newMessage];
+            });
+            setConversations((prev) =>
+              prev.map((c) =>
+                c.id === conversationId
+                  ? { ...c, lastMessage: newMessage.body, lastAt: newMessage.created_at }
+                  : c
+              )
+            );
+            scrollToBottom();
+          })
           .on('broadcast', { event: 'typing' }, (payload) => {
             const typingPayload = payload.payload as { userId?: string; name?: string; isTyping?: boolean };
             if (!typingPayload?.userId || typingPayload.userId === currentUserId) return;
@@ -415,11 +442,15 @@ function ConversationPageContent() {
     }
     if (!message.trim() || !conversationId) return;
     setSending(true);
-    const { error: insertError } = await supabase.from('messages').insert({
-      conversation_id: conversationId,
-      sender_id: userId,
-      body: message.trim(),
-    });
+    const { data: inserted, error: insertError } = await supabase
+      .from('messages')
+      .insert({
+        conversation_id: conversationId,
+        sender_id: userId,
+        body: message.trim(),
+      })
+      .select('id, body, sender_id, created_at, profiles(full_name,email)')
+      .maybeSingle();
     if (insertError) {
       setError(insertError.message);
       setSending(false);
@@ -431,21 +462,40 @@ function ConversationPageContent() {
       typingBroadcastTimeoutRef.current = null;
     }
     sendTypingSignal(false);
-    setMessages((prev) => [
-      ...prev,
-      {
-        id: `local-${Date.now()}`,
-        body: message.trim(),
-        sender_id: userId,
-        created_at: new Date().toISOString(),
-        author: 'You',
-      },
-    ]);
+    const mapped: DisplayMessage = inserted
+      ? {
+          id: inserted.id,
+          body: inserted.body,
+          sender_id: inserted.sender_id,
+          created_at: inserted.created_at,
+          author:
+            (inserted as any).profiles?.full_name ||
+            (inserted as any).profiles?.email ||
+            'You',
+        }
+      : {
+          id: `local-${Date.now()}`,
+          body: message.trim(),
+          sender_id: userId,
+          created_at: new Date().toISOString(),
+          author: 'You',
+        };
+    setMessages((prev) => {
+      if (prev.find((m) => m.id === mapped.id)) return prev;
+      return [...prev, mapped];
+    });
     setConversations((prev) =>
       prev.map((c) =>
         c.id === conversationId ? { ...c, lastMessage: message.trim(), lastAt: new Date().toISOString() } : c
       )
     );
+    if (channelRef.current) {
+      channelRef.current.send({
+        type: 'broadcast',
+        event: 'new-message',
+        payload: mapped,
+      });
+    }
     setMessage('');
     setSending(false);
     toast.success('Message sent', { id: 'message-status' });
