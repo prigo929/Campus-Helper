@@ -76,7 +76,7 @@ export default function SignUpClient() {
       }
 
       setMessage('Account created! Redirecting...');
-      router.push('/');
+      router.push('/home');
       router.refresh();
       setIsSubmitting(false);
       return;

@@ -53,7 +53,7 @@ export default function SearchPage() {
     if (window.history.length > 1) {
       router.back();
     } else {
-      router.push('/');
+      router.push('/home');
     }
   };
 

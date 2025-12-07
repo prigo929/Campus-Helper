@@ -85,7 +85,7 @@ function ConversationPageContent() {
         return;
       }
     }
-    router.push('/');
+    router.push('/home');
   };
 
   const scrollToBottom = () => {

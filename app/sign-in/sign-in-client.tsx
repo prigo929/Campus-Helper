@@ -99,7 +99,7 @@ export default function SignInClient() {
     }
 
     setMessage('Signed in! Redirecting...');
-    router.push('/');
+    router.push('/home');
     router.refresh();
     setIsSubmitting(false);
   };
@@ -124,7 +124,7 @@ export default function SignInClient() {
       email: email.trim(),
       options: {
         shouldCreateUser: false,
-        emailRedirectTo: typeof window !== 'undefined' ? `${window.location.origin}/` : undefined,
+        emailRedirectTo: typeof window !== 'undefined' ? `${window.location.origin}/home` : undefined,
       },
     });
 

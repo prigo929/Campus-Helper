@@ -118,7 +118,7 @@ export function Navigation() {
     setEmail('');
     setIsAdmin(false);
     setLoading(false);
-    router.push('/');
+    router.push('/home');
   };
 
   return (
@@ -126,7 +126,7 @@ export function Navigation() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         <div className="flex items-center gap-2 py-3">
           <div className="flex items-center space-x-2 flex-shrink-0">
-            <Link href="/" className="flex items-center space-x-2">
+            <Link href="/home" className="flex items-center space-x-2">
               <Logo className="w-10 h-10 min-w-[2.5rem] min-h-[2.5rem] shrink-0" />
               <span className="text-xl font-bold">Campus Helper</span>
             </Link>
