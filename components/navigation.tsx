@@ -81,12 +81,14 @@ export function Navigation() {
   }, []);
 
   useEffect(() => {
-    if (!supabase) return;
-    const { data: listener } = supabase.auth.onAuthStateChange(async (event) => {
+    const client = supabase;
+    if (!client) return;
+
+    const { data: listener } = client.auth.onAuthStateChange(async (event) => {
       // Cast to string to handle non-typed Supabase events like TOKEN_REFRESH_FAILED without type errors.
       if ((event as string) === 'TOKEN_REFRESH_FAILED') {
         toast.error('Your session expired. Please sign in again.');
-        await supabase.auth.signOut();
+        await client.auth.signOut();
         setIsAuthed(false);
         setDisplayName('');
         setEmail('');

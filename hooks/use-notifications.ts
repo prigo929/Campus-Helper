@@ -93,16 +93,17 @@ export function useNotifications() {
 
     return () => {
       active = false;
-      if (channel) {
-        supabase?.removeChannel(channel);
+      if (channel && supabase) {
+        supabase.removeChannel(channel);
       }
     };
   }, []);
 
   useEffect(() => {
-    if (!supabase || !sessionUserId) return;
+    const client = supabase;
+    if (!client || !sessionUserId) return;
 
-    const channel = supabase
+    const channel = client
       .channel(`notifications-${sessionUserId}`)
       .on(
         'postgres_changes',
@@ -118,7 +119,7 @@ export function useNotifications() {
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      client.removeChannel(channel);
     };
   }, [sessionUserId]);
 
