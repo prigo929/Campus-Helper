@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 import { Music2, Pause, Play, Volume2, VolumeX } from 'lucide-react';
 
-const VIDEO_ID = 'zWaymcVmJ-A'; // Macarena original, slowed via playbackRate
+const VIDEO_ID = 'Ann_XMs-gfc'; // Macarena (Slowed) | Military Edition
 
 export function BackgroundAudio() {
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -40,7 +40,7 @@ export function BackgroundAudio() {
           onReady: (event: any) => {
             if (!isMounted) return;
             event.target.setVolume?.(65);
-            event.target.setPlaybackRate?.(0.82);
+            event.target.setPlaybackRate?.(1);
             event.target.mute();
             setReady(true);
             setPlaying(true);
@@ -83,7 +83,7 @@ export function BackgroundAudio() {
     const player = playerRef.current;
     if (!player || !ready) return;
 
-    player.setPlaybackRate?.(0.82);
+    player.setPlaybackRate?.(1);
     if (playing) {
       player.playVideo();
     } else {
@@ -117,7 +117,7 @@ export function BackgroundAudio() {
         <div className="leading-tight">
           <p className="text-xs uppercase tracking-[0.14em] text-[#caa35d]">Now looping</p>
           <div className="flex items-center gap-2">
-            <p className="text-sm font-semibold">Macarena (slowed)</p>
+            <p className="text-sm font-semibold">Macarena (Slowed) | Military Edition</p>
             <Image src="/usa-flag.svg" alt="USA flag" width={24} height={16} className="h-4 w-6 rounded-sm border border-white/20 shadow-sm" />
           </div>
         </div>
