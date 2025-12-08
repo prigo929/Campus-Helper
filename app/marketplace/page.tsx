@@ -171,7 +171,7 @@ export default function MarketplacePage() {
             ...item,
             category_label: capitalizeCategory(item.category),
             posted: item.created_at,
-            seller: profile?.full_name || profile?.email || 'Campus Helper user',
+            seller: profile?.full_name || profile?.email || 'Military Helper user',
           };
         });
         setItems(mapped);
@@ -306,7 +306,7 @@ export default function MarketplacePage() {
                       </div>
 
                       <div className="flex items-center text-sm text-gray-600">
-                        <span className="font-medium">{item.seller || 'Campus Helper user'}</span>
+                        <span className="font-medium">{item.seller || 'Military Helper user'}</span>
                         {item.seller_rating && <span className="ml-2 text-[#d4af37]">★ {item.seller_rating}</span>}
                         <span className="ml-auto text-gray-400">
                           {item.posted ? formatDate(item.posted) : formatDate(item.created_at) || 'Recently listed'}

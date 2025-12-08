@@ -130,7 +130,7 @@ export default function JobsPage() {
           return {
             ...job,
             posted: job.created_at,
-            user_name: profile?.full_name || profile?.email || 'Campus Helper user',
+            user_name: profile?.full_name || profile?.email || 'Military Helper user',
           };
         });
         setJobs(mapped);
@@ -234,7 +234,7 @@ export default function JobsPage() {
                         <CardTitle className="text-xl text-[#1e3a5f] mb-2 line-clamp-2">{job.title}</CardTitle>
                         <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
                           <div className="flex items-center">
-                            <span className="font-medium">{job.user_name || 'Campus Helper user'}</span>
+                            <span className="font-medium">{job.user_name || 'Military Helper user'}</span>
                             {job.user_rating && <span className="ml-2 text-[#d4af37]">★ {job.user_rating}</span>}
                           </div>
                           <span className="text-gray-400">•</span>

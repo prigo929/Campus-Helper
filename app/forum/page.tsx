@@ -165,7 +165,7 @@ export default function ForumPage() {
             trending: post.views ? post.views > 100 : false,
             comments: commentsCount,
             comments_count: commentsCount,
-            user_name: profile?.full_name || profile?.email || 'Campus Helper user',
+            user_name: profile?.full_name || profile?.email || 'Military Helper user',
           };
         });
         setPosts(mapped);
@@ -298,7 +298,7 @@ export default function ForumPage() {
                               )}
                             </div>
                             <div className="flex items-center gap-3 text-sm text-gray-600">
-                              <span className="font-medium">{post.user_name || 'Campus Helper user'}</span>
+                              <span className="font-medium">{post.user_name || 'Military Helper user'}</span>
                               {post.user_rating && <span className="text-[#d4af37]">★ {post.user_rating}</span>}
                               <span className="text-gray-400">•</span>
                               <span>{post.posted ? formatDate(post.posted) : formatDate(post.created_at)}</span>
