@@ -71,7 +71,7 @@ const FALLBACK_DATA: SupabaseHighlights = {
       user_id: 'demo',
       title: 'Desert camo netting (12x12)',
       description: 'Dust-treated netting for quick hide sites or vehicle shade.',
-      category: 'gear',
+      category: 'equipment',
       price: 240,
       condition: 'good',
       images: [],
