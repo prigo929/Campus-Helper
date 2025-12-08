@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 import { Music2, Pause, Play, Volume2, VolumeX } from 'lucide-react';
 
@@ -117,7 +118,7 @@ export function BackgroundAudio() {
           <p className="text-xs uppercase tracking-[0.14em] text-[#caa35d]">Now looping</p>
           <div className="flex items-center gap-2">
             <p className="text-sm font-semibold">Macarena (slowed)</p>
-            <img src="/usa-flag.svg" alt="USA flag" className="h-4 w-6 rounded-sm border border-white/20 shadow-sm" />
+            <Image src="/usa-flag.svg" alt="USA flag" width={24} height={16} className="h-4 w-6 rounded-sm border border-white/20 shadow-sm" />
           </div>
         </div>
       </div>

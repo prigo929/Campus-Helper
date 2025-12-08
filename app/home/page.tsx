@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { Briefcase, ShoppingBag, MessageSquare, Star, TrendingUp, Shield } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
@@ -184,7 +185,15 @@ export default async function Home() {
                     className="relative h-full overflow-hidden rounded-xl border border-[#caa35d]/40 bg-[#0f1c16] shadow-[0_30px_80px_rgba(0,0,0,0.35)]"
                     style={{ animationDelay: `${index * 80}ms` }}
                   >
-                    <img src={image.src} alt={image.alt} className="h-full w-full object-cover brightness-110 saturate-125" />
+                    <Image
+                      src={image.src}
+                      alt={image.alt}
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 33vw, 16vw"
+                      className="h-full w-full object-cover brightness-110 saturate-125"
+                      style={image.position ? { objectPosition: image.position } : undefined}
+                      priority={index < 3}
+                    />
                     <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#0f1c16] via-[#0f1c16]/55 to-transparent" />
                     <div className="pointer-events-none absolute left-3 top-3 rounded-full border border-[#caa35d]/60 bg-[#0f1c16]/70 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-[#caa35d]">
                       {image.badge ?? 'Desert Storm 1991'}
