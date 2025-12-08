@@ -87,7 +87,7 @@ const FALLBACK_DATA: SupabaseHighlights = {
       user_id: 'demo',
       title: 'Best dust-off LZ near Objective Falcon?',
       content: 'Need a flat zone within 5km, low dunes. Anyone flown it recently at night?',
-      category: 'aviation',
+      category: 'general',
       views: 168,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
