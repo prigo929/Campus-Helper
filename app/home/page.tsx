@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { Briefcase, ShoppingBag, MessageSquare, Star, TrendingUp, Shield } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
@@ -15,12 +16,11 @@ type SupabaseHighlights = {
 };
 
 const HERO_IMAGES = [
-  { src: '/desert-storm-collage-1.svg', alt: 'Operation Desert Storm propaganda collage poster' },
-  { src: '/desert-storm-collage-2.svg', alt: 'Hold the line Desert Storm morale art' },
-  {
-    src: 'https://images.unsplash.com/photo-1504274066651-8d31a536b11a?auto=format&fit=crop&w=1600&q=80',
-    alt: 'Rotorcraft over desert sands',
-  },
+  { src: '/desert-storm-collage-1.svg', alt: 'Operation Desert Storm propaganda collage poster', badge: 'Desert Storm 1991' },
+  { src: '/desert-storm-collage-2.svg', alt: 'Hold the line Desert Storm morale art', badge: 'Coalition Ready' },
+  { src: '/desert-storm-collage-1.svg', alt: 'After-action collage and field radio', badge: 'TOC Brief', position: 'center 35%' },
+  { src: '/desert-storm-collage-2.svg', alt: 'Armor column morale art with desert horizon', badge: 'Forward Ops', position: 'center 65%' },
+  { src: '/usa-flag.svg', alt: 'USA flag patch on desert kit', badge: 'USA' },
 ];
 
 const FALLBACK_DATA: SupabaseHighlights = {
@@ -177,17 +177,25 @@ export default async function Home() {
             <div className="absolute inset-0 opacity-45 mix-blend-overlay bg-[radial-gradient(circle_at_20%_20%,rgba(202,163,93,0.25),transparent_32%),radial-gradient(circle_at_70%_10%,rgba(182,107,46,0.16),transparent_30%),radial-gradient(circle_at_30%_80%,rgba(52,69,47,0.3),transparent_38%)]" />
             <div className="absolute inset-0 opacity-25 bg-[linear-gradient(120deg,rgba(255,255,255,0.07)_1px,transparent_1px),linear-gradient(-120deg,rgba(202,163,93,0.08)_1px,transparent_1px)] bg-[length:26px_26px]" />
             <div className="absolute inset-x-[-12%] -bottom-28 h-80 rotate-[-3deg]">
-              <div className="grid h-full grid-cols-1 gap-4 opacity-80 md:grid-cols-3">
+              <div className="grid h-full grid-cols-1 gap-4 opacity-80 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
                 {HERO_IMAGES.map((image, index) => (
                   <div
-                    key={image.src}
+                    key={`${image.src}-${index}`}
                     className="relative h-full overflow-hidden rounded-xl border border-[#caa35d]/40 bg-[#0f1c16] shadow-[0_30px_80px_rgba(0,0,0,0.35)]"
                     style={{ animationDelay: `${index * 80}ms` }}
                   >
-                    <img src={image.src} alt={image.alt} className="h-full w-full object-cover brightness-110 saturate-125" />
+                    <Image
+                      src={image.src}
+                      alt={image.alt}
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 33vw, 18vw"
+                      className="h-full w-full object-cover brightness-110 saturate-125"
+                      style={image.position ? { objectPosition: image.position } : undefined}
+                      priority={index < 3}
+                    />
                     <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#0f1c16] via-[#0f1c16]/55 to-transparent" />
                     <div className="pointer-events-none absolute left-3 top-3 rounded-full border border-[#caa35d]/60 bg-[#0f1c16]/70 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-[#caa35d]">
-                      Desert Storm 1991
+                      {image.badge ?? 'Desert Storm 1991'}
                     </div>
                   </div>
                 ))}
