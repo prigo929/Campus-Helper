@@ -15,12 +15,12 @@ type SupabaseHighlights = {
 };
 
 const HERO_IMAGES = [
-  { src: '/desert-storm-collage-1.svg', alt: 'Operation Desert Storm propaganda collage poster' },
-  { src: '/desert-storm-collage-2.svg', alt: 'Hold the line Desert Storm morale art' },
-  {
-    src: 'https://images.unsplash.com/photo-1504274066651-8d31a536b11a?auto=format&fit=crop&w=1600&q=80',
-    alt: 'Rotorcraft over desert sands',
-  },
+  { src: '/oil-desert-storm-tanks.jpg', alt: 'Column of tanks rolling through oil fires during Desert Storm', badge: 'Armor push' },
+  { src: '/desert-ops-tank.jpg', alt: 'Desert operation tank profile with crew ready', badge: 'OPS ready' },
+  { src: '/desert-storm-space.jpg', alt: 'Satellite view of Desert Storm theater at night', badge: 'Overwatch' },
+  { src: '/desert-storm-collage-1.svg', alt: 'Operation Desert Storm propaganda collage poster', badge: 'Desert Storm' },
+  { src: '/desert-storm-collage-2.svg', alt: 'Hold the line Desert Storm morale art', badge: 'Hold the line' },
+  { src: '/usa-flag.svg', alt: 'USA flag patch', badge: 'USA' },
 ];
 
 const FALLBACK_DATA: SupabaseHighlights = {
@@ -180,14 +180,14 @@ export default async function Home() {
               <div className="grid h-full grid-cols-1 gap-4 opacity-80 md:grid-cols-3">
                 {HERO_IMAGES.map((image, index) => (
                   <div
-                    key={image.src}
+                    key={`${image.src}-${index}`}
                     className="relative h-full overflow-hidden rounded-xl border border-[#caa35d]/40 bg-[#0f1c16] shadow-[0_30px_80px_rgba(0,0,0,0.35)]"
                     style={{ animationDelay: `${index * 80}ms` }}
                   >
                     <img src={image.src} alt={image.alt} className="h-full w-full object-cover brightness-110 saturate-125" />
                     <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#0f1c16] via-[#0f1c16]/55 to-transparent" />
                     <div className="pointer-events-none absolute left-3 top-3 rounded-full border border-[#caa35d]/60 bg-[#0f1c16]/70 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-[#caa35d]">
-                      Desert Storm 1991
+                      {image.badge ?? 'Desert Storm 1991'}
                     </div>
                   </div>
                 ))}

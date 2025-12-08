@@ -115,7 +115,10 @@ export function BackgroundAudio() {
         </span>
         <div className="leading-tight">
           <p className="text-xs uppercase tracking-[0.14em] text-[#caa35d]">Now looping</p>
-          <p className="text-sm font-semibold">Macarena (slowed)</p>
+          <div className="flex items-center gap-2">
+            <p className="text-sm font-semibold">Macarena (slowed)</p>
+            <img src="/usa-flag.svg" alt="USA flag" className="h-4 w-6 rounded-sm border border-white/20 shadow-sm" />
+          </div>
         </div>
       </div>
       <div className="flex items-center gap-1">
