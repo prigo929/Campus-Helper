@@ -376,7 +376,7 @@ export default async function Home() {
                     <ShoppingBag className="w-6 h-6 text-[#0f1c16]" />
                   </div>
                   <h3 className="text-xl font-bold text-[#f1df9c] mb-3">Supply exchange</h3>
-                  <p className="text-[#d9c8a5]/85 mb-4">
+                  <p className="text-[#f1df9c] mb-4">
                     Move kit, radios, and desert-ready gear with trusted peers. Barter, buy, or swap in minutes.
                   </p>
                   <div className="flex justify-end mt-auto pt-2">
@@ -394,7 +394,7 @@ export default async function Home() {
                     <MessageSquare className="w-6 h-6 text-[#0f1c16]" />
                   </div>
                   <h3 className="text-xl font-bold text-[#f1df9c] mb-3">Briefings & chatter</h3>
-                  <p className="text-[#d9c8a5]/85 mb-4">
+                  <p className="text-[#f1df9c] mb-4">
                     Drop quick intel, SOPs, or morale boosts. Keep everyone synced without drowning in noise.
                   </p>
                   <div className="flex justify-end mt-auto pt-2">

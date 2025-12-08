@@ -1,33 +1,17 @@
 import React from 'react';
 
-const Logo = ({ className = "w-10 h-10" }) => {
+type LogoProps = {
+  className?: string;
+};
+
+const Logo = ({ className = 'w-10 h-10' }: LogoProps) => {
   return (
-    <svg 
-      xmlns="http://www.w3.org/2000/svg" 
-      viewBox="0 0 200 200" 
-      className={className} // This allows you to control size with Tailwind
-      fill="none"
+    <div
+      className={`${className} flex items-center justify-center rounded-lg bg-gradient-to-br from-[#caa35d] to-[#b66b2e] border border-white/20 shadow-[0_10px_22px_rgba(0,0,0,0.35)] font-bold text-[#0f1c16] tracking-[0.18em] uppercase`}
+      aria-label="Military Helper logo"
     >
-      <defs>
-        <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#FDD075" />
-          <stop offset="50%" stopColor="#DFA938" />
-          <stop offset="100%" stopColor="#FDD075" />
-        </linearGradient>
-      </defs>
-      
-      {/* Outer Ring */}
-      <circle cx="100" cy="100" r="90" stroke="url(#goldGradient)" strokeWidth="12" />
-      
-      {/* The Monogram */}
-      <path 
-        d="M 130 65 A 65 65 0 0 0 70 65 L 70 135 A 65 65 0 0 0 130 135 L 130 115 L 100 115 L 100 135 A 35 35 0 0 1 100 65 L 100 85 L 130 85 Z" 
-        stroke="url(#goldGradient)" 
-        strokeWidth="10" 
-        strokeLinecap="round" 
-        strokeLinejoin="round" 
-      />
-    </svg>
+      <span className="text-sm">MH</span>
+    </div>
   );
 };
 
