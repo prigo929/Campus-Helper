@@ -4,8 +4,8 @@ import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 import { Music2, Pause, Play, Volume2, VolumeX } from 'lucide-react';
 
-const TRACK_QUERY = 'Macarena (Slowed) | Military Edition | 1 Hour';
-const FALLBACK_VIDEO_ID = 'zWaymcVmJ-A'; // fallback if the search playlist is blocked
+const VIDEO_ID = 'f8g_lG4xHXI'; // Macarena (Slowed) | Military Edition | 1 Hour
+const FALLBACK_VIDEO_ID = 'zWaymcVmJ-A'; // fallback if the main track is blocked
 const START_VOLUME = 70;
 const PLAYBACK_RATE = 1;
 
@@ -21,18 +21,28 @@ export function BackgroundAudio() {
     const player = playerRef.current;
     if (!player) return;
 
+    const primaryVideoId = VIDEO_ID;
+    const fallbackVideoId = FALLBACK_VIDEO_ID;
+
     if (!playlistLoadedRef.current && player.loadPlaylist) {
       try {
-        player.loadPlaylist({
-          listType: 'search',
-          list: TRACK_QUERY,
-        });
+        player.loadPlaylist([primaryVideoId]);
         player.setLoop?.(true);
         player.setShuffle?.(false);
         playlistLoadedRef.current = true;
       } catch (error) {
-        // Keep the fallback video playing if the search playlist is blocked.
+        // Try the fallback video if the primary track cannot load.
         console.warn('Background audio playlist failed to load', error);
+        if (fallbackVideoId && fallbackVideoId !== primaryVideoId) {
+          try {
+            player.loadPlaylist([fallbackVideoId]);
+            player.setLoop?.(true);
+            player.setShuffle?.(false);
+            playlistLoadedRef.current = true;
+          } catch (fallbackError) {
+            console.warn('Fallback audio failed to load', fallbackError);
+          }
+        }
       }
     }
 
@@ -56,12 +66,12 @@ export function BackgroundAudio() {
       playerRef.current = new YTGlobal.Player(containerRef.current, {
         height: '0',
         width: '0',
-        videoId: FALLBACK_VIDEO_ID,
+        videoId: VIDEO_ID,
         playerVars: {
           autoplay: 1,
           controls: 0,
           loop: 1,
-          playlist: FALLBACK_VIDEO_ID,
+          playlist: VIDEO_ID,
           modestbranding: 1,
           playsinline: 1,
           rel: 0,
