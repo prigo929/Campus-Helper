@@ -1,58 +1,16 @@
 'use client';
 
-import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 import { Music2, Pause, Play, Volume2, VolumeX } from 'lucide-react';
 
-const VIDEO_ID = 'f8g_lG4xHXI'; // Macarena (Slowed) | Military Edition | 1 Hour
-const FALLBACK_VIDEO_ID = 'zWaymcVmJ-A'; // fallback if the main track is blocked
-const START_VOLUME = 70;
-const PLAYBACK_RATE = 1;
+const VIDEO_ID = 'zWaymcVmJ-A'; // Macarena original, slowed via playbackRate
 
 export function BackgroundAudio() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const playerRef = useRef<any>(null);
-  const playlistLoadedRef = useRef(false);
   const [ready, setReady] = useState(false);
-  const [muted, setMuted] = useState(false);
+  const [muted, setMuted] = useState(true);
   const [playing, setPlaying] = useState(true);
-
-  const startAudio = () => {
-    const player = playerRef.current;
-    if (!player) return;
-
-    const primaryVideoId = VIDEO_ID;
-    const fallbackVideoId = FALLBACK_VIDEO_ID;
-
-    if (!playlistLoadedRef.current && player.loadPlaylist) {
-      try {
-        player.loadPlaylist([primaryVideoId]);
-        player.setLoop?.(true);
-        player.setShuffle?.(false);
-        playlistLoadedRef.current = true;
-      } catch (error) {
-        // Try the fallback video if the primary track cannot load.
-        console.warn('Background audio playlist failed to load', error);
-        if (fallbackVideoId && fallbackVideoId !== primaryVideoId) {
-          try {
-            player.loadPlaylist([fallbackVideoId]);
-            player.setLoop?.(true);
-            player.setShuffle?.(false);
-            playlistLoadedRef.current = true;
-          } catch (fallbackError) {
-            console.warn('Fallback audio failed to load', fallbackError);
-          }
-        }
-      }
-    }
-
-    player.setPlaybackRate?.(PLAYBACK_RATE);
-    player.setVolume?.(START_VOLUME);
-    player.unMute?.();
-    player.playVideo?.();
-    setMuted(false);
-    setPlaying(true);
-  };
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -75,19 +33,16 @@ export function BackgroundAudio() {
           modestbranding: 1,
           playsinline: 1,
           rel: 0,
-          mute: 0,
+          mute: 1,
         },
         events: {
           onReady: (event: any) => {
             if (!isMounted) return;
-            event.target.setVolume?.(START_VOLUME);
-            event.target.setPlaybackRate?.(PLAYBACK_RATE);
-            event.target.unMute?.();
-            playlistLoadedRef.current = false;
-            startAudio();
+            event.target.setVolume?.(65);
+            event.target.setPlaybackRate?.(0.82);
+            event.target.mute();
             setReady(true);
             setPlaying(true);
-            setMuted(false);
           },
           onStateChange: (event: any) => {
             if (!isMounted) return;
@@ -127,7 +82,7 @@ export function BackgroundAudio() {
     const player = playerRef.current;
     if (!player || !ready) return;
 
-    player.setPlaybackRate?.(PLAYBACK_RATE);
+    player.setPlaybackRate?.(0.82);
     if (playing) {
       player.playVideo();
     } else {
@@ -141,21 +96,6 @@ export function BackgroundAudio() {
     }
   }, [muted, playing, ready]);
 
-  useEffect(() => {
-    if (!ready) return;
-
-    const kickstart = () => startAudio();
-    window.addEventListener('pointerdown', kickstart, { once: true });
-    window.addEventListener('touchstart', kickstart, { once: true });
-    window.addEventListener('keydown', kickstart, { once: true });
-
-    return () => {
-      window.removeEventListener('pointerdown', kickstart);
-      window.removeEventListener('touchstart', kickstart);
-      window.removeEventListener('keydown', kickstart);
-    };
-  }, [ready]);
-
   const togglePlay = () => {
     if (!ready) return;
     setPlaying((prev) => !prev);
@@ -167,19 +107,15 @@ export function BackgroundAudio() {
   };
 
   return (
-    <div className="fixed bottom-4 right-4 z-[60] flex items-center gap-3 rounded-full border border-white/10 bg-[#0f1c16]/90 px-3 py-2 text-[#d9c8a5] shadow-xl backdrop-blur-md">
+    <div className="fixed bottom-4 right-4 z-[60] flex items-center gap-3 rounded-full border border-white/10 bg-[#0f1c16]/85 px-3 py-2 text-[#d9c8a5] shadow-xl backdrop-blur-md">
       <div ref={containerRef} className="hidden" aria-hidden="true" />
       <div className="flex items-center gap-2">
-        <span className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5">
+        <span className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-white/5">
           <Music2 className="h-4 w-4" />
         </span>
         <div className="leading-tight">
           <p className="text-xs uppercase tracking-[0.14em] text-[#caa35d]">Now looping</p>
-          <div className="flex items-center gap-2">
-            <p className="text-sm font-semibold leading-tight">Macarena (Slowed) | Military Edition | 1 Hour</p>
-            <Image src="/usa-flag.svg" alt="USA flag" width={24} height={16} className="h-4 w-6 rounded-sm border border-white/20 shadow-sm" />
-          </div>
-          <p className="text-[11px] text-white/70">Starts unmuted • loops automatically</p>
+          <p className="text-sm font-semibold">Macarena (slowed)</p>
         </div>
       </div>
       <div className="flex items-center gap-1">
