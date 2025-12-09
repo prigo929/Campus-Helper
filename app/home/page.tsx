@@ -267,7 +267,7 @@ export default async function Home() {
                     </div>
                     <div className="space-y-4">
                       {jobs.map((job) => (
-                        <div key={job.id} className="border border-[#caa35d]/25 rounded-lg p-3 bg-[#0f1c16]/70">
+                        <div key={job.id} className="border border-[#caa35d]/25 rounded-lg p-3 bg-[#0f1c16]/70 flex flex-col gap-1.5">
                           <div className="flex items-start justify-between gap-2">
                             <div>
                               <p className="font-semibold text-[#f1df9c]">{job.title}</p>
@@ -277,7 +277,7 @@ export default async function Home() {
                               {currency.format(Number(job.pay_rate))}/{job.pay_type === 'hourly' ? 'hr' : 'mission'}
                             </span>
                           </div>
-                          <p className="text-sm text-[#d9c8a5]/80 mt-2 max-h-12 overflow-hidden text-ellipsis">{job.description}</p>
+                          <p className="text-sm text-[#d9c8a5]/80 line-clamp-3 min-h-[3.6em]">{job.description}</p>
                         </div>
                       ))}
                     </div>
@@ -295,7 +295,7 @@ export default async function Home() {
                     </div>
                     <div className="space-y-4">
                       {items.map((item) => (
-                        <div key={item.id} className="border border-[#caa35d]/25 rounded-lg p-3 bg-[#0f1c16]/70">
+                        <div key={item.id} className="border border-[#caa35d]/25 rounded-lg p-3 bg-[#0f1c16]/70 flex flex-col gap-1.5">
                           <div className="flex items-start justify-between gap-2">
                             <div>
                               <p className="font-semibold text-[#f1df9c]">{item.title}</p>
@@ -303,7 +303,7 @@ export default async function Home() {
                             </div>
                             <span className="text-sm font-semibold text-[#caa35d]">{currency.format(Number(item.price))}</span>
                           </div>
-                          <p className="text-sm text-[#d9c8a5]/80 mt-2 max-h-12 overflow-hidden text-ellipsis">{item.description}</p>
+                          <p className="text-sm text-[#d9c8a5]/80 line-clamp-3 min-h-[3.6em]">{item.description}</p>
                         </div>
                       ))}
                     </div>
@@ -323,14 +323,14 @@ export default async function Home() {
                       {posts.map((post) => (
                         <div
                           key={post.id}
-                          className="border border-[#caa35d]/25 rounded-lg p-3 bg-[#0f1c16]/70 max-h-32 overflow-hidden"
+                          className="border border-[#caa35d]/25 rounded-lg p-3 bg-[#0f1c16]/70 min-h-[7.5rem] flex flex-col gap-1.5"
                         >
                           <div className="flex items-start justify-between gap-2">
                             <p className="font-semibold text-[#f1df9c]">{post.title}</p>
                             <span className="text-xs font-semibold text-[#caa35d] uppercase">{post.category}</span>
                           </div>
-                          <p className="text-sm text-[#d9c8a5]/80 mt-2 line-clamp-2">{post.content}</p>
-                          <p className="text-xs text-[#d9c8a5]/70 mt-2">{post.views ?? 0} views</p>
+                          <p className="text-sm text-[#d9c8a5]/80 line-clamp-2 min-h-[2.6em]">{post.content}</p>
+                          <p className="text-xs text-[#d9c8a5]/70 mt-auto pt-1">{post.views ?? 0} views</p>
                         </div>
                       ))}
                     </div>
