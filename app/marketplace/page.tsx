@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { supabase, type MarketplaceItem } from '@/lib/supabase';
 import { getSafeSession } from '@/lib/get-safe-session';
 
-const categories = ['All', 'Equipment', 'Gear', 'Signal', 'Medical', 'Other'];
+const categories = ['All', 'Equipment', 'Books', 'Notes', 'Exams', 'Other'];
 
 type DisplayItem = MarketplaceItem & {
   seller?: string;
@@ -46,7 +46,7 @@ const sampleItems: DisplayItem[] = [
     user_id: 'demo',
     title: 'Desert camo netting (12x12)',
     description: 'Dust-treated netting for quick hide sites or vehicle shade.',
-    category: 'gear',
+    category: 'equipment',
     price: 240,
     condition: 'good',
     status: 'available',
@@ -61,7 +61,7 @@ const sampleItems: DisplayItem[] = [
     user_id: 'demo',
     title: 'IFAK restock bundle',
     description: 'Tourniquets, gauze, chest seals, and compression bandages. Sealed and dated.',
-    category: 'medical',
+    category: 'other',
     price: 160,
     condition: 'new',
     status: 'available',
@@ -76,7 +76,7 @@ const sampleItems: DisplayItem[] = [
     user_id: 'demo',
     title: 'Signal flare pack (IR + vis)',
     description: 'Mixed IR/visible flares, sealed. Keep your LZ marked under NODs.',
-    category: 'signal',
+    category: 'equipment',
     price: 95,
     condition: 'like_new',
     status: 'available',
@@ -91,7 +91,7 @@ const sampleItems: DisplayItem[] = [
     user_id: 'demo',
     title: 'Kevlar plates (size M) – matched pair',
     description: 'Level III+, minimal wear, inspected after last rotation.',
-    category: 'gear',
+    category: 'equipment',
     price: 820,
     condition: 'good',
     status: 'available',
@@ -120,9 +120,9 @@ const sampleItems: DisplayItem[] = [
 
 const categoryIcons = {
   Equipment: Laptop,
-  Gear: Microscope,
-  Signal: FileText,
-  Medical: BookOpen,
+  Books: BookOpen,
+  Notes: FileText,
+  Exams: Microscope,
   Other: Microscope,
 };
 
