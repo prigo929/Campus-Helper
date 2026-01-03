@@ -27,8 +27,8 @@ export async function POST(req: Request) {
     });
   }
 
-  const uiMessages = messages.map(({ id: _id, ...rest }) => rest) as Parameters<typeof convertToModelMessages>[0];
-  const modelMessages = convertToModelMessages(uiMessages);
+  const uiMessages = messages.map(({ id: _id, ...rest }) => rest) as any;
+  const modelMessages = await convertToModelMessages(uiMessages);
 
   const groqModel = process.env.GROQ_MODEL || 'llama-3.1-8b-instant';
 

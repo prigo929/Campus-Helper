@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase, type Job } from '@/lib/supabase';
 import { getSafeSession } from '@/lib/get-safe-session';
@@ -214,77 +215,115 @@ export default function JobsPage() {
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="mb-6">
-            <p className="text-gray-600 flex items-center gap-3">
-              Showing <span className="font-semibold text-[#1e3a5f]">{filteredJobs.length}</span> jobs
-              {loading && <Loader2 className="w-4 h-4 animate-spin text-[#1e3a5f]" />}
-            </p>
+          <div className="mb-6 h-6">
+            {!loading && (
+              <p className="text-gray-600 flex items-center gap-3 animate-fade-in-up">
+                Showing <span className="font-semibold text-[#1e3a5f]">{filteredJobs.length}</span> jobs
+              </p>
+            )}
           </div>
 
-          <div className="grid gap-6">
-            {filteredJobs.map((job, index) => (
-              <Link href={`/jobs/detail?id=${job.id}`} key={job.id}>
-                <Card
-                  className="hover:shadow-lg transition-shadow border-2 hover:border-[#d4af37] bg-white/90 backdrop-blur animate-fade-in-up h-full"
-                  style={{ animationDelay: `${index * 0.05}s` }}
-                >
+          {loading ? (
+            <div className="grid gap-6">
+              {[...Array(6)].map((_, i) => (
+                <Card key={i} className="border-2 bg-white/90 backdrop-blur h-full">
                   <CardHeader>
                     <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <CardTitle className="text-xl text-[#1e3a5f] mb-2 line-clamp-2">{job.title}</CardTitle>
-                        <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
-                          <div className="flex items-center">
-                            <span className="font-medium">{job.user_name || 'Campus Helper user'}</span>
-                            {job.user_rating && <span className="ml-2 text-[#d4af37]">★ {job.user_rating}</span>}
-                          </div>
-                          <span className="text-gray-400">•</span>
-                          <span>{job.posted ? formatDate(job.posted) : formatDate(job.created_at) || 'Recently posted'}</span>
+                      <div className="flex-1 space-y-2">
+                        <Skeleton className="h-6 w-3/4" />
+                        <div className="flex items-center gap-4">
+                          <Skeleton className="h-4 w-24" />
+                          <Skeleton className="h-4 w-16" />
                         </div>
                       </div>
-                      <Badge className="bg-[#d4af37] text-[#1e3a5f] hover:bg-[#c19b2e]">
-                        {job.category}
-                      </Badge>
+                      <Skeleton className="h-6 w-20 rounded-full" />
                     </div>
                   </CardHeader>
-                  <CardContent className="space-y-4 overflow-hidden">
-                    <p className="text-gray-700 line-clamp-3">{job.description}</p>
-
-                    <div className="flex flex-wrap items-center gap-4 text-sm">
-                      <div className="flex items-center text-gray-600">
-                        <DollarSign className="w-4 h-4 mr-1 text-[#d4af37]" />
-                        <span className="font-semibold text-[#1e3a5f]">
-                          ${job.pay_rate}
-                        </span>
-                        <span className="ml-1">
-                          {job.pay_type === 'hourly' ? '/hr' : job.pay_type === 'fixed' ? 'total' : 'negotiable'}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center text-gray-600">
-                        <MapPin className="w-4 h-4 mr-1 text-[#d4af37]" />
-                        {job.location}
-                      </div>
-
-                      <div className="flex items-center text-gray-600">
-                        <Clock className="w-4 h-4 mr-1 text-[#d4af37]" />
-                        {(job.status || 'open') === 'open' ? 'Open' : 'Closed'}
-                      </div>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                      <Skeleton className="h-4 w-full" />
+                      <Skeleton className="h-4 w-full" />
+                      <Skeleton className="h-4 w-2/3" />
                     </div>
-
-                    <div className="mt-4 pt-4 border-t flex items-center justify-between text-sm text-gray-500">
-                      <span>Updated {formatDate(job.updated_at || job.created_at) || 'recently'}</span>
-                      <span className="text-[#1e3a5f] group-hover:text-[#d4af37]">View Details →</span>
+                    <div className="flex gap-4">
+                      <Skeleton className="h-4 w-20" />
+                      <Skeleton className="h-4 w-20" />
+                      <Skeleton className="h-4 w-20" />
+                    </div>
+                    <div className="pt-4 border-t flex justify-between">
+                      <Skeleton className="h-4 w-24" />
+                      <Skeleton className="h-4 w-20" />
                     </div>
                   </CardContent>
                 </Card>
-              </Link>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid gap-6">
+              {filteredJobs.map((job, index) => (
+                <Link href={`/jobs/detail?id=${job.id}`} key={job.id}>
+                  <Card
+                    className="hover:shadow-lg transition-shadow border-2 hover:border-[#d4af37] bg-white/90 backdrop-blur animate-fade-in-up h-full"
+                    style={{ animationDelay: `${index * 0.05}s` }}
+                  >
+                    <CardHeader>
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <CardTitle className="text-xl text-[#1e3a5f] mb-2 line-clamp-2">{job.title}</CardTitle>
+                          <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
+                            <div className="flex items-center">
+                              <span className="font-medium">{job.user_name || 'Campus Helper user'}</span>
+                              {job.user_rating && <span className="ml-2 text-[#d4af37]">★ {job.user_rating}</span>}
+                            </div>
+                            <span className="text-gray-400">•</span>
+                            <span>{job.posted ? formatDate(job.posted) : formatDate(job.created_at) || 'Recently posted'}</span>
+                          </div>
+                        </div>
+                        <Badge className="bg-[#d4af37] text-[#1e3a5f] hover:bg-[#c19b2e]">
+                          {job.category}
+                        </Badge>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="space-y-4 overflow-hidden">
+                      <p className="text-gray-700 line-clamp-3">{job.description}</p>
 
-          {filteredJobs.length === 0 && (
+                      <div className="flex flex-wrap items-center gap-4 text-sm">
+                        <div className="flex items-center text-gray-600">
+                          <DollarSign className="w-4 h-4 mr-1 text-[#d4af37]" />
+                          <span className="font-semibold text-[#1e3a5f]">
+                            ${job.pay_rate}
+                          </span>
+                          <span className="ml-1">
+                            {job.pay_type === 'hourly' ? '/hr' : job.pay_type === 'fixed' ? 'total' : 'negotiable'}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center text-gray-600">
+                          <MapPin className="w-4 h-4 mr-1 text-[#d4af37]" />
+                          {job.location}
+                        </div>
+
+                        <div className="flex items-center text-gray-600">
+                          <Clock className="w-4 h-4 mr-1 text-[#d4af37]" />
+                          {(job.status || 'open') === 'open' ? 'Open' : 'Closed'}
+                        </div>
+                      </div>
+
+                      <div className="mt-4 pt-4 border-t flex items-center justify-between text-sm text-gray-500">
+                        <span>Updated {formatDate(job.updated_at || job.created_at) || 'recently'}</span>
+                        <span className="text-[#1e3a5f] group-hover:text-[#d4af37]">View Details →</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          )}
+
+          {!loading && filteredJobs.length === 0 && (
             <div className="text-center py-12">
               <p className="text-gray-500 text-lg">
-                {loading ? 'Loading jobs...' : 'No jobs found matching your criteria.'}
+                No jobs found matching your criteria.
               </p>
               <p className="text-gray-400 mt-2">Try adjusting your filters or search terms.</p>
             </div>
