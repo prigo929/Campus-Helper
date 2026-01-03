@@ -6,22 +6,17 @@ const MAX_RESULTS = 10;
 const MAX_FETCH = 40;
 const EMPTY_RESULTS = { jobs: [], items: [], posts: [] };
 
-// Use Node runtime so the service-role key works and avoid edge limitations.
+// Use Node runtime so we can use Supabase client properly, but we removed service key usage.
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 function getClient(authHeader?: string): {
   client: SupabaseClient | null;
-  usingServiceKey: boolean;
-  usingUserToken: boolean;
 } {
   const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceKey =
-    process.env.SUPABASE_SERVICE_ROLE_KEY ||
-    process.env.SUPABASE_SERVICE_KEY ||
-    process.env.SUPABASE_SECRET_KEY ||
-    process.env.SUPABASE_SECRET ||
-    '';
+  // We explicitly IGNORE the service role key here to ensure RLS is always respected.
+  // Public search should only return what is visible to the anonymous user (or the authenticated user if token provided).
+
   const anonKey =
     process.env.SUPABASE_ANON_KEY ||
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
@@ -30,18 +25,15 @@ function getClient(authHeader?: string): {
 
   const headers = authHeader ? { Authorization: authHeader } : undefined;
 
-  // Prefer service role for broader access; fall back to anon key if that is all we have.
-  if (supabaseUrl && (serviceKey || anonKey)) {
+  if (supabaseUrl && anonKey) {
     return {
-      client: createClient(supabaseUrl, serviceKey || anonKey, {
+      client: createClient(supabaseUrl, anonKey, {
         auth: { autoRefreshToken: false, persistSession: false },
         global: headers ? { headers } : undefined,
       }),
-      usingServiceKey: Boolean(serviceKey),
-      usingUserToken: Boolean(authHeader && !serviceKey),
     };
   }
-  return { client: supabase, usingServiceKey: false, usingUserToken: false };
+  return { client: supabase };
 }
 
 function tokenize(query: string) {
@@ -118,7 +110,7 @@ export async function GET(request: Request) {
   }
 
   const authHeader = request.headers.get('authorization') || undefined;
-  const { client, usingServiceKey, usingUserToken } = getClient(authHeader);
+  const { client } = getClient(authHeader);
   if (!client) {
     console.warn('Supabase not configured; cannot search.');
     return NextResponse.json({ error: 'Search unavailable' }, { status: 500 });
@@ -186,17 +178,11 @@ export async function GET(request: Request) {
         .slice(0, MAX_RESULTS);
 
     const meta = {
-      usedServiceKey: usingServiceKey,
       counts: {
         jobs: rankedJobs.length,
         items: rankedItems.length,
         posts: rankedPosts.length,
       },
-      warning:
-        !usingServiceKey && !usingUserToken && rankedJobs.length + rankedItems.length + rankedPosts.length === 0
-          ? 'No results returned; if your tables use RLS, add SUPABASE_SERVICE_ROLE_KEY to enable search.'
-          : undefined,
-      usingUserToken,
     };
 
     return NextResponse.json({

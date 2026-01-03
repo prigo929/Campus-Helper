@@ -1,0 +1,4 @@
+## 2024-05-23 - Service Role Key Risk in Public Search
+**Vulnerability:** The search endpoint (`app/api/search/route.ts`) explicitly prioritizes `SUPABASE_SERVICE_ROLE_KEY` if available in the environment variables. This bypasses Supabase's Row Level Security (RLS) policies.
+**Learning:** Using the service role key for "broader access" in a public endpoint is dangerous because it exposes all data (including drafts, deleted items, or private fields) unless manually filtered. The endpoint relies on `ilike` filters on specific fields but does not respect `status` or other business logic encoded in RLS.
+**Prevention:** Avoid using `SUPABASE_SERVICE_ROLE_KEY` in client-facing endpoints. If global search is needed, ensure the database RLS policies allow public access to the specific "public" data, or create a specific "searcher" database role with limited privileges, rather than using the super-admin service role.
