@@ -8,6 +8,8 @@ import { Navigation } from '@/components/navigation';
 import { Footer } from '@/components/footer';
 import { HomeFinalCta, HomeHeroActions } from '@/components/home-auth-cta';
 
+export const revalidate = 60;
+
 type SupabaseHighlights = {
   jobs: Job[];
   items: MarketplaceItem[];
