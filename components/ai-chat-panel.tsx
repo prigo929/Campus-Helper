@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, memo } from 'react';
 import { useChat, type UIMessage } from '@ai-sdk/react';
 import { Sparkles, Send, StopCircle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -27,6 +27,49 @@ function extractText(parts: UIMessage['parts']) {
     .join('\n')
     .trim();
 }
+
+// Optimization: Memoized message component prevents re-rendering previous messages during streaming
+const ChatMessage = memo(({ message }: { message: UIMessage }) => {
+  const isUser = message.role === 'user';
+  const text = extractText(message.parts);
+  return (
+    <div
+      className={cn(
+        'relative flex gap-2 rounded-xl border p-3 shadow-sm overflow-hidden transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg animate-chat-pop',
+        isUser
+          ? 'bg-[#1e3a5f] text-white border-[#1e3a5f]'
+          : 'bg-white text-gray-900 border-gray-200'
+      )}
+    >
+      <span
+        className={cn(
+          'pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500',
+          isUser
+            ? 'bg-gradient-to-r from-white/10 via-white/5 to-white/0'
+            : 'bg-gradient-to-r from-purple-500/10 via-indigo-400/10 to-transparent'
+        )}
+      />
+      <div className="mt-1">
+        {isUser ? (
+          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white/20 text-xs font-semibold uppercase">
+            You
+          </div>
+        ) : (
+          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#f4d03f]/25 text-[#1e3a5f]">
+            <Sparkles className="w-4 h-4" />
+          </div>
+        )}
+      </div>
+      <div className="space-y-1">
+        <p className="text-xs font-semibold uppercase tracking-wide opacity-80">
+          {isUser ? 'You' : 'Campus Helper AI'}
+        </p>
+        <p className="whitespace-pre-wrap leading-relaxed">{text || '...'}</p>
+      </div>
+    </div>
+  );
+});
+ChatMessage.displayName = 'ChatMessage';
 
 export function AiChatPanel() {
   const { messages, sendMessage, stop, status, error, clearError } = useChat();
@@ -97,47 +140,9 @@ export function AiChatPanel() {
 
               {messages
                 .filter((message: UIMessage) => message.role !== 'system')
-                .map((message: UIMessage) => {
-                  const isUser = message.role === 'user';
-                  const text = extractText(message.parts);
-                  return (
-                    <div
-                      key={message.id}
-                      className={cn(
-                        'relative flex gap-2 rounded-xl border p-3 shadow-sm overflow-hidden transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg animate-chat-pop',
-                        isUser
-                          ? 'bg-[#1e3a5f] text-white border-[#1e3a5f]'
-                          : 'bg-white text-gray-900 border-gray-200'
-                      )}
-                    >
-                      <span
-                        className={cn(
-                          'pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500',
-                          isUser
-                            ? 'bg-gradient-to-r from-white/10 via-white/5 to-white/0'
-                            : 'bg-gradient-to-r from-purple-500/10 via-indigo-400/10 to-transparent'
-                        )}
-                      />
-                      <div className="mt-1">
-                        {isUser ? (
-                          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white/20 text-xs font-semibold uppercase">
-                            You
-                          </div>
-                        ) : (
-                          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#f4d03f]/25 text-[#1e3a5f]">
-                            <Sparkles className="w-4 h-4" />
-                          </div>
-                        )}
-                      </div>
-                      <div className="space-y-1">
-                        <p className="text-xs font-semibold uppercase tracking-wide opacity-80">
-                          {isUser ? 'You' : 'Campus Helper AI'}
-                        </p>
-                        <p className="whitespace-pre-wrap leading-relaxed">{text || '...'}</p>
-                      </div>
-                    </div>
-                  );
-                })}
+                .map((message: UIMessage) => (
+                  <ChatMessage key={message.id} message={message} />
+                ))}
             </div>
           </ScrollArea>
         </div>
