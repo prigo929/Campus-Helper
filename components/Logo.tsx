@@ -1,32 +1,102 @@
 import React from 'react';
 
-const Logo = ({ className = "w-10 h-10" }) => {
+const Logo = ({ className = "w-10 h-10" }: { className?: string }) => {
   return (
-    <svg 
-      xmlns="http://www.w3.org/2000/svg" 
-      viewBox="0 0 200 200" 
-      className={className} // This allows you to control size with Tailwind
-      fill="none"
-    >
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" className={className}>
       <defs>
+        {/* Complex Gold Gradient for Metallic Effect */}
         <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#FDD075" />
-          <stop offset="50%" stopColor="#DFA938" />
-          <stop offset="100%" stopColor="#FDD075" />
+          <stop offset="0%" stopColor="#FBF5B7" />
+          <stop offset="20%" stopColor="#BF953F" />
+          <stop offset="40%" stopColor="#FCF6BA" />
+          <stop offset="60%" stopColor="#B38728" />
+          <stop offset="80%" stopColor="#FBF5B7" />
+          <stop offset="100%" stopColor="#AA771C" />
         </linearGradient>
+        
+        {/* Darker Gold for Edges/Depth */}
+        <linearGradient id="goldDark" x1="100%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#8a6e2f" />
+          <stop offset="100%" stopColor="#463610" />
+        </linearGradient>
+
+        {/* Background Gradient (Deep Navy/Academic Blue) */}
+        <radialGradient id="bgGradient" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+          <stop offset="0%" stopColor="#1a2a40" />
+          <stop offset="100%" stopColor="#0d1620" />
+        </radialGradient>
+
+        {/* Drop Shadow Filter */}
+        <filter id="dropShadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur in="SourceAlpha" stdDeviation="4" result="blur"/>
+          <feOffset in="blur" dx="2" dy="4" result="offsetBlur"/>
+          <feComponentTransfer>
+            <feFuncA type="linear" slope="0.5"/>
+          </feComponentTransfer>
+          <feMerge>
+            <feMergeNode in="offsetBlur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+        
+        {/* Inner Bevel Filter */}
+        <filter id="bevel">
+          <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur"/>
+          <feSpecularLighting in="blur" surfaceScale="5" specularConstant="0.75" specularExponent="20" lightingColor="#fffee0" result="specOut">
+            <fePointLight x="-5000" y="-10000" z="20000"/>
+          </feSpecularLighting>
+          <feComposite in="specOut" in2="SourceAlpha" operator="in" result="specOut"/>
+          <feComposite in="SourceGraphic" in2="specOut" operator="arithmetic" k1="0" k2="1" k3="1" k4="0" result="litPaint"/>
+        </filter>
       </defs>
+
+      {/* Main Background Container */}
+      <circle cx="256" cy="256" r="240" fill="url(#bgGradient)" stroke="url(#goldGradient)" strokeWidth="8" />
       
-      {/* Outer Ring */}
-      <circle cx="100" cy="100" r="90" stroke="url(#goldGradient)" strokeWidth="12" />
+      {/* Inner Ring */}
+      <circle cx="256" cy="256" r="220" fill="none" stroke="url(#goldDark)" strokeWidth="2" opacity="0.5" />
+
+      {/* Logo Group */}
+      <g filter="url(#dropShadow)">
+        
+        {/* Graduation Cap (Mortarboard) Element */}
+        <g transform="translate(0, -20)">
+          <path d="M256 100 L360 145 L256 190 L152 145 Z" fill="url(#goldGradient)" filter="url(#bevel)"/>
+          <path d="M360 145 L360 165 L256 210 L152 165 L152 145 L256 190 Z" fill="url(#goldDark)" opacity="0.8"/>
+          {/* Tassel */}
+          <circle cx="256" cy="145" r="5" fill="#BF953F"/>
+          <path d="M256 145 Q290 160 300 200" fill="none" stroke="url(#goldGradient)" strokeWidth="3" strokeLinecap="round"/>
+          <circle cx="300" cy="200" r="6" fill="url(#goldGradient)"/>
+        </g>
+
+        {/* Typography Group */}
+        <g transform="translate(0, 30)" filter="url(#bevel)">
+          
+          {/* Letter C */}
+          <path d="M200 180 
+                   L200 210 
+                   Q160 210 160 250 
+                   Q160 290 200 290 
+                   L200 320 
+                   Q110 320 110 250 
+                   Q110 180 200 180 Z" 
+                fill="url(#goldGradient)" />
+          
+          {/* Serif blocks for C */}
+          <rect x="190" y="180" width="40" height="30" fill="url(#goldGradient)" />
+          <rect x="190" y="290" width="40" height="30" fill="url(#goldGradient)" />
+
+          {/* Letter H */}
+          <path d="M240 180 L280 180 L280 235 L340 235 L340 180 L380 180 L380 320 L340 320 L340 265 L280 265 L280 320 L240 320 Z" 
+                fill="url(#goldGradient)" />
+                
+          {/* Decorative Underline (Open Book Spine hint) */}
+          <path d="M130 350 Q256 380 382 350 L382 360 Q256 390 130 360 Z" fill="url(#goldGradient)" opacity="0.9"/>
+        </g>
+      </g>
       
-      {/* The Monogram */}
-      <path 
-        d="M 130 65 A 65 65 0 0 0 70 65 L 70 135 A 65 65 0 0 0 130 135 L 130 115 L 100 115 L 100 135 A 35 35 0 0 1 100 65 L 100 85 L 130 85 Z" 
-        stroke="url(#goldGradient)" 
-        strokeWidth="10" 
-        strokeLinecap="round" 
-        strokeLinejoin="round" 
-      />
+      {/* Shine/Reflection Overlay */}
+      <path d="M150 100 L200 100 L100 400 L50 400 Z" fill="white" opacity="0.05" transform="rotate(-15 256 256)"/>
     </svg>
   );
 };

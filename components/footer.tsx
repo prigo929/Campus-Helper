@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Logo from '@/components/Logo';
 
 export function Footer() {
   return (
@@ -7,9 +8,7 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
             <div className="flex items-center space-x-2 mb-4">
-              <div className="w-8 h-8 bg-gradient-to-br from-[#d4af37] to-[#f4d03f] rounded-lg flex items-center justify-center font-bold text-[#1e3a5f]">
-                CH
-              </div>
+              <Logo className="w-8 h-8" />
               <span className="text-lg font-bold">Campus Helper</span>
             </div>
             <p className="text-sm text-gray-300">
