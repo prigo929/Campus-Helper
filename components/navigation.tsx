@@ -125,7 +125,7 @@ export function Navigation() {
   };
 
   return (
-    <nav className="bg-[#1e3a5f] text-white shadow-md sticky top-0 z-50">
+    <nav className="bg-[#1e3a5f] text-white shadow-md sticky top-0 z-50 border-b border-white/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         <div className="flex items-center gap-2 py-3">
           <div className="flex items-center space-x-2 flex-shrink-0">
