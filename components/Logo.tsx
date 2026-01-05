@@ -4,14 +4,28 @@ const Logo = ({ className = "w-10 h-10" }: { className?: string }) => {
   const id = useId().replace(/:/g, '-');
   const clipId = `circleClip-${id}`;
   const shineGradId = `shineGradient-${id}`;
-  const goldGradId = `goldGradient-${id}`;
-  const goldDarkId = `goldDark-${id}`;
-  const bgGradId = `bgGradient-${id}`;
   const shadowId = `dropShadow-${id}`;
-  const bevelId = `bevel-${id}`;
+  const _Radial1 = `Radial1-${id}`;
+  const _Linear2 = `Linear2-${id}`;
+  const _Linear3 = `Linear3-${id}`;
+  const _Linear4 = `Linear4-${id}`;
+  const _Linear5 = `Linear5-${id}`;
+  const _Linear6 = `Linear6-${id}`;
+  const _Linear7 = `Linear7-${id}`;
+  const _Linear8 = `Linear8-${id}`;
+  const _Linear9 = `Linear9-${id}`;
+  const _Linear10 = `Linear10-${id}`;
 
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" className={`${className} logo-glow`}>
+    <svg 
+      className={`${className} logo-glow`}
+      viewBox="0 0 512 512" 
+      version="1.1" 
+      xmlns="http://www.w3.org/2000/svg" 
+      xmlnsXlink="http://www.w3.org/1999/xlink" 
+      xmlSpace="preserve" 
+      style={{ fillRule: 'evenodd', clipRule: 'evenodd' }}
+    >
       <style>{`
         @keyframes glow-pulse {
           0%, 100% { filter: drop-shadow(0 0 5px rgba(212,175,55,0.4)); }
@@ -29,40 +43,41 @@ const Logo = ({ className = "w-10 h-10" }: { className?: string }) => {
           transform-origin: center;
         }
       `}</style>
+
+      <circle cx="256" cy="256" r="240" style={{ fill: `url(#${_Radial1})`, stroke: `url(#${_Linear2})`, strokeWidth: '8px' }} />
+      <circle cx="256" cy="256" r="220" style={{ fill: 'none', stroke: `url(#${_Linear3})`, strokeWidth: '2px' }} />
+      <g filter={`url(#${shadowId})`}>
+        <g transform="matrix(1,0,0,1,1,-20)">
+          <path d="M255,100L360,145L255,190L150,145L255,100Z" style={{ fill: `url(#${_Linear4})`, fillRule: 'nonzero' }} />
+          <path d="M360,145L360,165L255,210L150,165L150,145L255,190L360,145Z" style={{ fill: `url(#${_Linear5})`, fillRule: 'nonzero' }} />
+          <circle cx="256" cy="145" r="5" style={{ fill: 'rgb(191,149,63)' }} />
+          <path d="M256,145C278.667,155 293.333,173.333 300,200" style={{ fill: 'none', fillRule: 'nonzero', stroke: `url(#${_Linear6})`, strokeWidth: '3px', strokeLinecap: 'round' }} />
+          <circle cx="300" cy="200" r="6" style={{ fill: `url(#${_Linear7})` }} />
+        </g>
+        <g transform="matrix(1,0,0,1,4.43747,30)">
+          <g transform="matrix(1.33333,0,0,1,-26.6806,0)">
+            <path d="M201.161,180L201.161,219.962C174.494,219.962 148.672,223.333 148.672,250C148.672,276.667 174.494,280 201.161,280L201.161,320C141.161,320 111.172,296.667 111.172,250C111.172,203.333 141.161,180 201.161,180Z" style={{ fill: `url(#${_Linear8})`, fillRule: 'nonzero' }} />
+          </g>
+          <g transform="matrix(1,0,0,1,10.013,0)">
+            <path d="M251.548,180L291.673,180L291.585,230L331.548,230L331.548,180L371.548,180L371.548,320L331.548,320L331.548,270L291.548,270L291.673,320L251.548,320L251.548,180Z" style={{ fill: `url(#${_Linear9})`, fillRule: 'nonzero' }} />
+          </g>
+          <g transform="matrix(1,0,0,1,-3.43747,0)">
+            <path d="M130,350C214,370 296,370 380,350L380,360C285.355,380 201.833,380 130,360L130,350Z" style={{ fill: `url(#${_Linear10})`, fillRule: 'nonzero' }} />
+          </g>
+        </g>
+      </g>
+      <g transform="matrix(0.965926,-0.258819,0.258819,0.965926,-61.5491,74.9807)">
+        <path d="M150,100L200,100L100,400L50,400L150,100Z" style={{ fill: 'white', fillOpacity: 0.05, fillRule: 'nonzero' }} />
+      </g>
       <defs>
         <clipPath id={clipId}>
           <circle cx="256" cy="256" r="240" />
         </clipPath>
-
         <linearGradient id={shineGradId} x1="0%" y1="0%" x2="100%" y2="0%">
           <stop offset="0%" stopColor="white" stopOpacity="0" />
           <stop offset="50%" stopColor="white" stopOpacity="0.5" />
           <stop offset="100%" stopColor="white" stopOpacity="0" />
         </linearGradient>
-
-        {/* Complex Gold Gradient for Metallic Effect */}
-        <linearGradient id={goldGradId} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#FBF5B7" />
-          <stop offset="20%" stopColor="#BF953F" />
-          <stop offset="40%" stopColor="#FCF6BA" />
-          <stop offset="60%" stopColor="#B38728" />
-          <stop offset="80%" stopColor="#FBF5B7" />
-          <stop offset="100%" stopColor="#AA771C" />
-        </linearGradient>
-        
-        {/* Darker Gold for Edges/Depth */}
-        <linearGradient id={goldDarkId} x1="100%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="#8a6e2f" />
-          <stop offset="100%" stopColor="#463610" />
-        </linearGradient>
-
-        {/* Background Gradient (Deep Navy/Academic Blue) */}
-        <radialGradient id={bgGradId} cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
-          <stop offset="0%" stopColor="#1a2a40" />
-          <stop offset="100%" stopColor="#0d1620" />
-        </radialGradient>
-
-        {/* Drop Shadow Filter */}
         <filter id={shadowId} x="-20%" y="-20%" width="140%" height="140%">
           <feGaussianBlur in="SourceAlpha" stdDeviation="4" result="blur"/>
           <feOffset in="blur" dx="2" dy="4" result="offsetBlur"/>
@@ -74,64 +89,77 @@ const Logo = ({ className = "w-10 h-10" }: { className?: string }) => {
             <feMergeNode in="SourceGraphic"/>
           </feMerge>
         </filter>
-        
-        {/* Inner Bevel Filter */}
-        <filter id={bevelId}>
-          <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur"/>
-          <feSpecularLighting in="blur" surfaceScale="5" specularConstant="0.75" specularExponent="20" lightingColor="#fffee0" result="specOut">
-            <fePointLight x="-5000" y="-10000" z="20000"/>
-          </feSpecularLighting>
-          <feComposite in="specOut" in2="SourceAlpha" operator="in" result="specOut"/>
-          <feComposite in="SourceGraphic" in2="specOut" operator="arithmetic" k1="0" k2="1" k3="1" k4="0" result="litPaint"/>
-        </filter>
+
+        <radialGradient id={_Radial1} cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="matrix(240,0,0,240,256,256)">
+          <stop offset="0" style={{ stopColor: 'rgb(26,42,64)', stopOpacity: 1 }} />
+          <stop offset="1" style={{ stopColor: 'rgb(13,22,32)', stopOpacity: 1 }} />
+        </radialGradient>
+        <linearGradient id={_Linear2} x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(480,480,-480,480,16,16)">
+          <stop offset="0" style={{ stopColor: 'rgb(251,245,183)', stopOpacity: 1 }} />
+          <stop offset="0.2" style={{ stopColor: 'rgb(191,149,63)', stopOpacity: 1 }} />
+          <stop offset="0.4" style={{ stopColor: 'rgb(252,246,186)', stopOpacity: 1 }} />
+          <stop offset="0.6" style={{ stopColor: 'rgb(179,135,40)', stopOpacity: 1 }} />
+          <stop offset="0.8" style={{ stopColor: 'rgb(251,245,183)', stopOpacity: 1 }} />
+          <stop offset="1" style={{ stopColor: 'rgb(170,119,28)', stopOpacity: 1 }} />
+        </linearGradient>
+        <linearGradient id={_Linear3} x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(-440,440,-440,-440,476,36)">
+          <stop offset="0" style={{ stopColor: 'rgb(138,110,47)', stopOpacity: 0.5 }} />
+          <stop offset="1" style={{ stopColor: 'rgb(70,54,16)', stopOpacity: 0.5 }} />
+        </linearGradient>
+        <linearGradient id={_Linear4} x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(208,90,-90,208,152,100)">
+          <stop offset="0" style={{ stopColor: 'rgb(251,245,183)', stopOpacity: 1 }} />
+          <stop offset="0.2" style={{ stopColor: 'rgb(191,149,63)', stopOpacity: 1 }} />
+          <stop offset="0.4" style={{ stopColor: 'rgb(252,246,186)', stopOpacity: 1 }} />
+          <stop offset="0.6" style={{ stopColor: 'rgb(179,135,40)', stopOpacity: 1 }} />
+          <stop offset="0.8" style={{ stopColor: 'rgb(251,245,183)', stopOpacity: 1 }} />
+          <stop offset="1" style={{ stopColor: 'rgb(170,119,28)', stopOpacity: 1 }} />
+        </linearGradient>
+        <linearGradient id={_Linear5} x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(-208,65,-65,-208,360,145)">
+          <stop offset="0" style={{ stopColor: 'rgb(138,110,47)', stopOpacity: 0.8 }} />
+          <stop offset="1" style={{ stopColor: 'rgb(70,54,16)', stopOpacity: 0.8 }} />
+        </linearGradient>
+        <linearGradient id={_Linear6} x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(44,55,-55,44,256,145)">
+          <stop offset="0" style={{ stopColor: 'rgb(251,245,183)', stopOpacity: 1 }} />
+          <stop offset="0.2" style={{ stopColor: 'rgb(191,149,63)', stopOpacity: 1 }} />
+          <stop offset="0.4" style={{ stopColor: 'rgb(252,246,186)', stopOpacity: 1 }} />
+          <stop offset="0.6" style={{ stopColor: 'rgb(179,135,40)', stopOpacity: 1 }} />
+          <stop offset="0.8" style={{ stopColor: 'rgb(251,245,183)', stopOpacity: 1 }} />
+          <stop offset="1" style={{ stopColor: 'rgb(170,119,28)', stopOpacity: 1 }} />
+        </linearGradient>
+        <linearGradient id={_Linear7} x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(12,12,-12,12,294,194)">
+          <stop offset="0" style={{ stopColor: 'rgb(251,245,183)', stopOpacity: 1 }} />
+          <stop offset="0.2" style={{ stopColor: 'rgb(191,149,63)', stopOpacity: 1 }} />
+          <stop offset="0.4" style={{ stopColor: 'rgb(252,246,186)', stopOpacity: 1 }} />
+          <stop offset="0.6" style={{ stopColor: 'rgb(179,135,40)', stopOpacity: 1 }} />
+          <stop offset="0.8" style={{ stopColor: 'rgb(251,245,183)', stopOpacity: 1 }} />
+          <stop offset="1" style={{ stopColor: 'rgb(170,119,28)', stopOpacity: 1 }} />
+        </linearGradient>
+        <linearGradient id={_Linear8} x1="0" y1="0" x2="1" y2="0.228202" gradientUnits="userSpaceOnUse" gradientTransform="matrix(90,140,-140,90,110,180)">
+          <stop offset="0" style={{ stopColor: 'rgb(251,245,183)', stopOpacity: 1 }} />
+          <stop offset="0.2" style={{ stopColor: 'rgb(191,149,63)', stopOpacity: 1 }} />
+          <stop offset="0.4" style={{ stopColor: 'rgb(252,246,186)', stopOpacity: 1 }} />
+          <stop offset="0.6" style={{ stopColor: 'rgb(179,135,40)', stopOpacity: 1 }} />
+          <stop offset="0.8" style={{ stopColor: 'rgb(251,245,183)', stopOpacity: 1 }} />
+          <stop offset="1" style={{ stopColor: 'rgb(170,119,28)', stopOpacity: 1 }} />
+        </linearGradient>
+        <linearGradient id={_Linear9} x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(140,140,-140,140,240,180)">
+          <stop offset="0" style={{ stopColor: 'rgb(251,245,183)', stopOpacity: 1 }} />
+          <stop offset="0.2" style={{ stopColor: 'rgb(191,149,63)', stopOpacity: 1 }} />
+          <stop offset="0.4" style={{ stopColor: 'rgb(252,246,186)', stopOpacity: 1 }} />
+          <stop offset="0.6" style={{ stopColor: 'rgb(179,135,40)', stopOpacity: 1 }} />
+          <stop offset="0.8" style={{ stopColor: 'rgb(251,245,183)', stopOpacity: 1 }} />
+          <stop offset="1" style={{ stopColor: 'rgb(170,119,28)', stopOpacity: 1 }} />
+        </linearGradient>
+        <linearGradient id={_Linear10} x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(252,25,-25,252,130,350)">
+          <stop offset="0" style={{ stopColor: 'rgb(251,245,183)', stopOpacity: 0.9 }} />
+          <stop offset="0.2" style={{ stopColor: 'rgb(191,149,63)', stopOpacity: 0.9 }} />
+          <stop offset="0.4" style={{ stopColor: 'rgb(252,246,186)', stopOpacity: 0.9 }} />
+          <stop offset="0.6" style={{ stopColor: 'rgb(179,135,40)', stopOpacity: 0.9 }} />
+          <stop offset="0.8" style={{ stopColor: 'rgb(251,245,183)', stopOpacity: 0.9 }} />
+          <stop offset="1" style={{ stopColor: 'rgb(170,119,28)', stopOpacity: 0.9 }} />
+        </linearGradient>
       </defs>
 
-      {/* Main Background Container */}
-      <circle cx="256" cy="256" r="240" fill={`url(#${bgGradId})`} stroke={`url(#${goldGradId})`} strokeWidth="8" />
-      
-      {/* Inner Ring */}
-      <circle cx="256" cy="256" r="220" fill="none" stroke={`url(#${goldDarkId})`} strokeWidth="2" opacity="0.5" />
-
-      {/* Logo Group */}
-      <g filter={`url(#${shadowId})`}>
-        
-        {/* Graduation Cap (Mortarboard) Element */}
-        <g transform="translate(0, -20)">
-          <path d="M256 100 L360 145 L256 190 L152 145 Z" fill={`url(#${goldGradId})`} filter={`url(#${bevelId})`}/>
-          <path d="M360 145 L360 165 L256 210 L152 165 L152 145 L256 190 Z" fill={`url(#${goldDarkId})`} opacity="0.8"/>
-          {/* Tassel */}
-          <circle cx="256" cy="145" r="5" fill="#BF953F"/>
-          <path d="M256 145 Q290 160 300 200" fill="none" stroke={`url(#${goldGradId})`} strokeWidth="3" strokeLinecap="round"/>
-          <circle cx="300" cy="200" r="6" fill={`url(#${goldGradId})`}/>
-        </g>
-
-        {/* Typography Group */}
-        <g transform="translate(0, 30)" filter={`url(#${bevelId})`}>
-          
-          {/* Letter C */}
-          <path d="M200 180 
-                   L200 210 
-                   Q160 210 160 250 
-                   Q160 290 200 290 
-                   L200 320 
-                   Q110 320 110 250 
-                   Q110 180 200 180 Z" 
-                fill={`url(#${goldGradId})`} />
-          
-          {/* Serif blocks for C */}
-          <rect x="190" y="180" width="40" height="30" fill={`url(#${goldGradId})`} />
-          <rect x="190" y="290" width="40" height="30" fill={`url(#${goldGradId})`} />
-
-          {/* Letter H */}
-          <path d="M240 180 L280 180 L280 235 L340 235 L340 180 L380 180 L380 320 L340 320 L340 265 L280 265 L280 320 L240 320 Z" 
-                fill={`url(#${goldGradId})`} />
-                
-          {/* Decorative Underline (Open Book Spine hint) */}
-          <path d="M130 350 Q256 380 382 350 L382 360 Q256 390 130 360 Z" fill={`url(#${goldGradId})`} opacity="0.9"/>
-        </g>
-      </g>
-      
-      {/* Shine/Reflection Overlay */}
       <g clipPath={`url(#${clipId})`}>
         <rect x="200" y="-100" width="112" height="712" fill={`url(#${shineGradId})`} className="logo-shine" />
       </g>
