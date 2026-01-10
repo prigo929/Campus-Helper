@@ -129,9 +129,14 @@ export function Navigation() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         <div className="flex items-center gap-2 py-3">
           <div className="flex items-center space-x-2 flex-shrink-0">
-            <Link href="/home" className="flex items-center space-x-2">
-              <Logo className="w-10 h-10 min-w-[2.5rem] min-h-[2.5rem] shrink-0" />
-              <span className="text-xl font-bold tracking-[0.14em] uppercase">Military Helper</span>
+            <Link href="/home" className="group relative flex items-center space-x-2 overflow-hidden rounded-xl px-2 py-1 hover:bg-white/5 transition-colors">
+              <span className="pointer-events-none absolute inset-0 translate-x-[-150%] bg-gradient-to-r from-transparent via-[#caa35d]/40 to-transparent animate-shimmer" />
+              <div className="relative z-10 flex items-center space-x-2">
+                <Logo className="w-10 h-10 min-w-[2.5rem] min-h-[2.5rem] shrink-0 drop-shadow-[0_0_5px_rgba(202,163,93,0.4)] transition-all duration-300 group-hover:drop-shadow-[0_0_15px_rgba(202,163,93,0.8)] group-hover:scale-110" />
+                <span className="text-xl font-bold tracking-[0.14em] uppercase text-[#f1df9c] transition-colors duration-300 group-hover:text-[#caa35d] group-hover:tracking-[0.16em]">
+                  Military Helper
+                </span>
+              </div>
             </Link>
             {isAdmin && (
               <Link href="/admin/reports" className="hidden md:inline-flex">
@@ -191,12 +196,12 @@ export function Navigation() {
               <>
                 <NotificationsDropdown />
                 <Link href="/messages" aria-label="Messages" className="hidden sm:inline-flex">                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-10 w-10 text-[#f1df9c] hover:text-[#caa35d] hover:bg-[#1a2217]"
-                  >
-                    <MessageSquare className="w-5 h-5" />
-                  </Button>
+                  variant="ghost"
+                  size="icon"
+                  className="h-10 w-10 text-[#f1df9c] hover:text-[#caa35d] hover:bg-[#1a2217]"
+                >
+                  <MessageSquare className="w-5 h-5" />
+                </Button>
                 </Link>
                 <Link href="/profile">
                   <Button
