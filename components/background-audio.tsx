@@ -34,17 +34,25 @@ export function BackgroundAudio() {
           modestbranding: 1,
           playsinline: 1,
           rel: 0,
-          mute: 0,
+          mute: 0, // Request unmuted start
         },
         events: {
           onReady: (event: any) => {
             if (!isMounted) return;
             event.target.setVolume?.(65);
             event.target.setPlaybackRate?.(1);
-            event.target.unMute?.();
+            event.target.unMute?.(); // Enforce unmuted
+            event.target.playVideo();
             setReady(true);
             setPlaying(true);
-            setMuted(false);
+            setMuted(false); // Update state to unmuted immediately
+
+            // Still keep the fallback check, just in case
+            setTimeout(() => {
+              if (playerRef.current?.unMute) {
+                playerRef.current.unMute();
+              }
+            }, 500);
           },
           onStateChange: (event: any) => {
             if (!isMounted) return;
@@ -73,10 +81,31 @@ export function BackgroundAudio() {
       createPlayer();
     }
 
+    // Global interaction listener to unmute if needed
+    const handleInteraction = () => {
+      if (playerRef.current && playerRef.current.unMute) {
+        playerRef.current.unMute();
+        playerRef.current.playVideo();
+        setMuted(false);
+        setPlaying(true);
+      }
+      // Remove listener after first interaction
+      window.removeEventListener('click', handleInteraction);
+      window.removeEventListener('keydown', handleInteraction);
+      window.removeEventListener('touchstart', handleInteraction);
+    };
+
+    window.addEventListener('click', handleInteraction);
+    window.addEventListener('keydown', handleInteraction);
+    window.addEventListener('touchstart', handleInteraction);
+
     return () => {
       isMounted = false;
       playerRef.current?.destroy?.();
       playerRef.current = null;
+      window.removeEventListener('click', handleInteraction);
+      window.removeEventListener('keydown', handleInteraction);
+      window.removeEventListener('touchstart', handleInteraction);
     };
   }, []);
 
@@ -84,17 +113,22 @@ export function BackgroundAudio() {
     const player = playerRef.current;
     if (!player || !ready) return;
 
-    player.setPlaybackRate?.(1);
-    if (playing) {
-      player.playVideo();
-    } else {
-      player.pauseVideo();
-    }
+    // Use try-catch to avoid crashing if player method is missing or fails
+    try {
+      player.setPlaybackRate?.(1);
+      if (playing) {
+        player.playVideo();
+      } else {
+        player.pauseVideo();
+      }
 
-    if (muted) {
-      player.mute();
-    } else {
-      player.unMute();
+      if (muted) {
+        player.mute();
+      } else {
+        player.unMute();
+      }
+    } catch (e) {
+      console.error("Audio player error:", e);
     }
   }, [muted, playing, ready]);
 
