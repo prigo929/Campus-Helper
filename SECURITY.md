@@ -2,20 +2,32 @@
 
 ## Supported Versions
 
-Use this section to tell people about which versions of your project are
-currently being supported with security updates.
+We are committed to ensuring the security of Campus Helper. Currently, we support the following versions with security updates:
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 5.1.x   | :white_check_mark: |
-| 5.0.x   | :x:                |
-| 4.0.x   | :white_check_mark: |
-| < 4.0   | :x:                |
+| Latest  | :white_check_mark: |
+| < Latest| :x:                |
 
 ## Reporting a Vulnerability
 
-Use this section to tell people how to report a vulnerability.
+We take the security of our software seriously. If you believe you have found a security vulnerability in Campus Helper, please report it to us as described below.
 
-Tell them where to go, how often they can expect to get an update on a
-reported vulnerability, what to expect if the vulnerability is accepted or
-declined, etc.
+**Please do not report security vulnerabilities through public GitHub issues.**
+
+### How to Report
+
+If you have discovered a security vulnerability, please email us at **[INSERT SECURITY EMAIL HERE]** or open a **Private Vulnerability Report** in this repository if enabled.
+
+Please include the following details in your report:
+
+*   A description of the vulnerability.
+*   Steps to reproduce the issue.
+*   Potential impact of the vulnerability.
+
+### Disclosure Policy
+
+*   We ask that you do not disclose the vulnerability to the public until a patch has been released.
+*   We will credit you for your discovery in our release notes (unless you prefer to remain anonymous).
+
+Thank you for helping keep Campus Helper safe!
