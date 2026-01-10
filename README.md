@@ -15,7 +15,7 @@ Campus Helper is a full-stack web platform for university students to:
 - Chat with other students in (near) real time  
 - Get smart help from an integrated **AI assistant**  
 
-It started as a university project, but the goal is to build it with **production-style architecture** using **Next.js (App Router)**, **TypeScript**, **Supabase**, **Tailwind CSS + shadcn/ui**, and **Vercel**, following a **Scrum** workflow in **Jira**.
+It started as a university project, but the goal is to build it with **production-style architecture** using **Next.js (App Router)**, **TypeScript**, **Supabase**, **Tailwind CSS + shadcn/ui**, and **Vercel**.
 
 ---
 
