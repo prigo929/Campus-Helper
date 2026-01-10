@@ -11,7 +11,7 @@ export function BackgroundAudio() {
   const playerRef = useRef<any>(null);
   const [ready, setReady] = useState(false);
   const [muted, setMuted] = useState(false);
-  const [playing, setPlaying] = useState(true);
+  const [playing, setPlaying] = useState(false);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
