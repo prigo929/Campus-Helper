@@ -2,9 +2,12 @@
 
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
-import { Music2, Pause, Play, Volume2, VolumeX } from 'lucide-react';
+import { Music2, Pause, Play, SkipForward, Volume2, VolumeX } from 'lucide-react';
 
-const VIDEO_ID = 'Ann_XMs-gfc'; // Macarena (Slowed) | Military Edition
+const PLAYLIST = [
+  { id: 'Ann_XMs-gfc', title: 'Macarena (Slowed) | Military Edition' },
+  { id: 'ojtYXmyLcyI', title: 'Government Hooker' },
+];
 
 export function BackgroundAudio() {
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -12,6 +15,7 @@ export function BackgroundAudio() {
   const [ready, setReady] = useState(false);
   const [muted, setMuted] = useState(false);
   const [playing, setPlaying] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -25,12 +29,12 @@ export function BackgroundAudio() {
       playerRef.current = new YTGlobal.Player(containerRef.current, {
         height: '0',
         width: '0',
-        videoId: VIDEO_ID,
+        videoId: PLAYLIST[0].id,
         playerVars: {
           autoplay: 1,
           controls: 0,
-          loop: 1,
-          playlist: VIDEO_ID,
+          loop: 1, // Loop current video if not manually skipped
+          playlist: PLAYLIST[0].id, // Required for loop to work on single video
           modestbranding: 1,
           playsinline: 1,
           rel: 0,
@@ -58,6 +62,11 @@ export function BackgroundAudio() {
             if (!isMounted) return;
             const endedState = (window as any).YT?.PlayerState?.ENDED;
             if (endedState !== undefined && event.data === endedState) {
+              // Auto-advance or Loop? User said "Looping". 
+              // Usually bg music loops. If they want playlist cycle, we'd auto-advance.
+              // For now, let's stick to looping the current track until "Next" is pressed,
+              // or loop the playlist? "cycles through them" usually implies manual or auto.
+              // Given "Macarena" loops endlessly, let's default to Loop Single, Manual Skip.
               event.target.seekTo(0);
               event.target.playVideo();
             }
@@ -109,13 +118,26 @@ export function BackgroundAudio() {
     };
   }, []);
 
+  // Watch for index changes to load new video
   useEffect(() => {
     const player = playerRef.current;
     if (!player || !ready) return;
 
-    // Use try-catch to avoid crashing if player method is missing or fails
+    // Check if player has loadVideoById method (it should)
+    if (player.loadVideoById) {
+      player.loadVideoById(PLAYLIST[currentIndex].id);
+      if (playing) { // Keep playing state
+        player.playVideo();
+      }
+    }
+  }, [currentIndex, ready]); // Depend on ready so if it becomes ready late, we are good.
+
+  // Sync controls
+  useEffect(() => {
+    const player = playerRef.current;
+    if (!player || !ready) return;
+
     try {
-      player.setPlaybackRate?.(1);
       if (playing) {
         player.playVideo();
       } else {
@@ -142,6 +164,12 @@ export function BackgroundAudio() {
     setMuted((prev) => !prev);
   };
 
+  const skipTrack = () => {
+    if (!ready) return;
+    setCurrentIndex((prev) => (prev + 1) % PLAYLIST.length);
+    setPlaying(true); // Ensure it plays when skipping
+  };
+
   return (
     <div className="fixed bottom-4 right-4 z-[60] flex items-center gap-3 rounded-full border border-white/10 bg-[#0f1c16]/85 px-3 py-2 text-[#d9c8a5] shadow-xl backdrop-blur-md">
       <div ref={containerRef} className="hidden" aria-hidden="true" />
@@ -152,12 +180,16 @@ export function BackgroundAudio() {
         <div className="leading-tight">
           <p className="text-xs uppercase tracking-[0.14em] text-[#caa35d]">Now looping</p>
           <div className="flex items-center gap-2">
-            <p className="text-sm font-semibold">Macarena (Slowed) | Military Edition</p>
-            <Image src="/usa-flag.svg" alt="USA flag" width={24} height={16} className="h-4 w-6 rounded-sm border border-white/20 shadow-sm" />
+            <p className="text-sm font-semibold whitespace-nowrap">{PLAYLIST[currentIndex].title}</p>
           </div>
         </div>
       </div>
       <div className="flex items-center gap-1">
+        <button
+          type="button"
+          aria-label="Previous track" // Actually just next, but good to have label
+          className="hidden" // Hidden prev button if we wanted one
+        />
         <button
           type="button"
           aria-label={playing ? 'Pause background audio' : 'Play background audio'}
@@ -166,6 +198,15 @@ export function BackgroundAudio() {
           disabled={!ready}
         >
           {playing ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+        </button>
+        <button
+          type="button"
+          aria-label="Next track"
+          className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white transition hover:bg-white/10 disabled:opacity-50"
+          onClick={skipTrack}
+          disabled={!ready}
+        >
+          <SkipForward className="h-4 w-4" />
         </button>
         <button
           type="button"
