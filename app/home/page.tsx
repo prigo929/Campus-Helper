@@ -31,7 +31,7 @@ const HERO_IMAGES = [
   { src: '/abrams-tank.jpg', alt: 'M1 Abrams', badge: 'Heavy Armor' },
   { src: '/soldier-m4.jpg', alt: 'Soldier with M4', badge: 'Infantry' },
   { src: '/soldier-patrol.jpg', alt: 'Patrol', badge: 'Recon' },
-  { src: '/usa-flag.svg', alt: 'USA Flag', badge: 'USA' },
+  { src: '/dave-sherrill-usa.jpg', alt: 'USA Flag', badge: 'USA' },
 ];
 
 const FALLBACK_DATA: SupabaseHighlights = {
