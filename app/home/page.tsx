@@ -19,10 +19,14 @@ const HERO_IMAGES = [
   { src: '/oil-desert-storm-tanks.jpg', alt: 'Tanks in oil fires', badge: 'Armor Push' },
   { src: '/desert-ops-tank.jpg', alt: 'Desert Ops', badge: 'OPS Ready' },
   { src: '/desert-storm-space.jpg', alt: 'Aerial View', badge: 'Overwatch' },
+  { src: '/user-army.jpg', alt: 'US Army Rangers', badge: 'Army Strong' },
+  { src: '/user-navy.webp', alt: 'USS Gerald R. Ford', badge: 'Naval Power' },
+  { src: '/us-af-f22.jpg', alt: 'F-22 Raptor', badge: 'Air Superiority' },
+  { src: '/us-sf-launch.jpg', alt: 'Space Force Launch', badge: 'Orbital Guard' },
+  { src: '/apache-helicopter.jpg', alt: 'AH-64 Apache', badge: 'Air Cavalry' },
+  { src: '/paratroopers-jump.jpg', alt: '82nd Airborne', badge: 'Airborne' },
   { src: '/ac-130.jpg', alt: 'AC-130 Gunship', badge: 'Air Support' },
-  { src: '/f16-falcon.jpg', alt: 'F-16 Falcon', badge: 'Air Superiority' },
-  { src: '/f22-raptor-1.jpg', alt: 'F-22 Raptor', badge: 'Stealth' },
-  { src: '/f35.jpg', alt: 'F-35 Lightning II', badge: 'Multirole' },
+  { src: '/f16-falcon.jpg', alt: 'F-16 Falcon', badge: 'Air Combat' },
   { src: '/aircraft-carrier.jpg', alt: 'USS Nimitz', badge: 'Naval Power' },
   { src: '/abrams-tank.jpg', alt: 'M1 Abrams', badge: 'Heavy Armor' },
   { src: '/soldier-m4.jpg', alt: 'Soldier with M4', badge: 'Infantry' },
@@ -185,12 +189,9 @@ export default async function Home() {
             {/* Marquee Container */}
             <div className="absolute top-1/2 -translate-y-1/2 -left-[10%] -right-[10%] opacity-60 rotate-[-3deg] select-none pointer-events-none">
               <div
-                className="flex gap-6 w-max animate-scroll"
+                className="flex w-max animate-scroll"
                 style={{
-                  width: '200%', // Ensure ample width for the loop
-                  animationDelay: '-100s', // Start in the middle of the loop (assuming 40s duration is too short for this many images, might need adjustment)
-                  // Actually, let's just use a large negative offset.
-                  // If duration is 40s, -20s is half way. 
+                  paddingRight: '32px', // Force end padding matching item margin
                 }}
               >
                 {/* Double the images to create seamless loop */}
@@ -198,6 +199,7 @@ export default async function Home() {
                   <div
                     key={`${image.src}-${index}`}
                     className="relative w-[300px] h-[400px] shrink-0 overflow-hidden rounded-xl border border-[#caa35d]/40 bg-[#0f1c16] shadow-[0_30px_80px_rgba(0,0,0,0.35)]"
+                    style={{ marginRight: '32px' }} // Force spacing between items
                   >
                     <Image
                       src={image.src}
@@ -244,6 +246,52 @@ export default async function Home() {
                   <p className="text-2xl font-bold">{posts.length} threads</p>
                 </div>
               </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="relative py-24 bg-[#0b0f0c] overflow-hidden">
+          {/* Decorative background elements */}
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(202,163,93,0.05),transparent_60%)]" />
+          <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#caa35d]/20 to-transparent" />
+
+          <div className="relative w-full mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="mb-12 text-center">
+              <h2 className="text-3xl md:text-4xl font-bold text-[#f1df9c] mb-4">
+                Theater Operations
+              </h2>
+              <p className="text-[#d9c8a5]/80 text-lg">
+                Visual confirmation of the grid capabilities.
+              </p>
+            </div>
+
+            <div className="group relative rounded-2xl overflow-hidden border border-[#caa35d]/30 bg-[#0f1c16] shadow-[0_30px_100px_rgba(0,0,0,0.5)] w-full max-w-6xl mx-auto">
+              {/* CRT Scanline effect overlay */}
+              <div className="pointer-events-none absolute inset-0 z-20 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_4px,3px_100%] opacity-15" />
+              <div className="pointer-events-none absolute inset-0 z-20 bg-gradient-to-t from-[#0b0f0c]/80 via-transparent to-transparent opacity-60" />
+
+              {/* Interaction Blocker */}
+              <div className="absolute inset-0 z-30 flex items-center justify-center pointer-events-none">
+                {/* Optional: Add a "REC" or "LIVE" overlay here if desired, but user just asked for no interaction */}
+              </div>
+
+              <div className="aspect-video w-full relative pointer-events-none">
+                <video
+                  className="w-full h-full object-cover scale-[1.01]"
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                >
+                  <source src="/theater-ops.mp4" type="video/mp4" />
+                </video>
+              </div>
+
+              {/* Decorative corners */}
+              <div className="absolute top-0 left-0 w-16 h-16 border-l-2 border-t-2 border-[#caa35d]/60 rounded-tl-2xl pointer-events-none" />
+              <div className="absolute top-0 right-0 w-16 h-16 border-r-2 border-t-2 border-[#caa35d]/60 rounded-tr-2xl pointer-events-none" />
+              <div className="absolute bottom-0 left-0 w-16 h-16 border-l-2 border-b-2 border-[#caa35d]/60 rounded-bl-2xl pointer-events-none" />
+              <div className="absolute bottom-0 right-0 w-16 h-16 border-r-2 border-b-2 border-[#caa35d]/60 rounded-br-2xl pointer-events-none" />
             </div>
           </div>
         </section>
@@ -459,51 +507,7 @@ export default async function Home() {
           </div>
         </section>
 
-        <section className="relative py-24 bg-[#0b0f0c] overflow-hidden">
-          {/* Decorative background elements */}
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(202,163,93,0.05),transparent_60%)]" />
-          <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#caa35d]/20 to-transparent" />
 
-          <div className="relative w-full mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="mb-12 text-center">
-              <h2 className="text-3xl md:text-4xl font-bold text-[#f1df9c] mb-4">
-                Theater Operations
-              </h2>
-              <p className="text-[#d9c8a5]/80 text-lg">
-                Visual confirmation of the grid capabilities.
-              </p>
-            </div>
-
-            <div className="group relative rounded-2xl overflow-hidden border border-[#caa35d]/30 bg-[#0f1c16] shadow-[0_30px_100px_rgba(0,0,0,0.5)] w-full max-w-6xl mx-auto">
-              {/* CRT Scanline effect overlay */}
-              <div className="pointer-events-none absolute inset-0 z-20 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_4px,3px_100%] opacity-15" />
-              <div className="pointer-events-none absolute inset-0 z-20 bg-gradient-to-t from-[#0b0f0c]/80 via-transparent to-transparent opacity-60" />
-
-              {/* Interaction Blocker */}
-              <div className="absolute inset-0 z-30 flex items-center justify-center pointer-events-none">
-                {/* Optional: Add a "REC" or "LIVE" overlay here if desired, but user just asked for no interaction */}
-              </div>
-
-              <div className="aspect-video w-full relative pointer-events-none">
-                <video
-                  className="w-full h-full object-cover scale-[1.01]"
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                >
-                  <source src="/theater-ops.mp4" type="video/mp4" />
-                </video>
-              </div>
-
-              {/* Decorative corners */}
-              <div className="absolute top-0 left-0 w-16 h-16 border-l-2 border-t-2 border-[#caa35d]/60 rounded-tl-2xl pointer-events-none" />
-              <div className="absolute top-0 right-0 w-16 h-16 border-r-2 border-t-2 border-[#caa35d]/60 rounded-tr-2xl pointer-events-none" />
-              <div className="absolute bottom-0 left-0 w-16 h-16 border-l-2 border-b-2 border-[#caa35d]/60 rounded-bl-2xl pointer-events-none" />
-              <div className="absolute bottom-0 right-0 w-16 h-16 border-r-2 border-b-2 border-[#caa35d]/60 rounded-br-2xl pointer-events-none" />
-            </div>
-          </div>
-        </section>
 
         <HomeFinalCta />
 

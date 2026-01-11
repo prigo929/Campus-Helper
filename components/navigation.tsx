@@ -129,13 +129,30 @@ export function Navigation() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         <div className="flex items-center gap-2 py-3">
           <div className="flex items-center space-x-2 flex-shrink-0">
-            <Link href="/home" className="group relative flex items-center space-x-2 overflow-hidden rounded-xl px-2 py-1 hover:bg-white/5 transition-colors">
-              <span className="pointer-events-none absolute inset-0 translate-x-[-150%] bg-gradient-to-r from-transparent via-[#caa35d]/40 to-transparent animate-shimmer" />
-              <div className="relative z-10 flex items-center space-x-2">
-                <Logo className="w-10 h-10 min-w-[2.5rem] min-h-[2.5rem] shrink-0 drop-shadow-[0_0_5px_rgba(202,163,93,0.4)] transition-all duration-300 group-hover:drop-shadow-[0_0_15px_rgba(202,163,93,0.8)] group-hover:scale-110" />
-                <span className="text-xl font-bold tracking-[0.14em] uppercase text-[#f1df9c] transition-colors duration-300 group-hover:text-[#caa35d] group-hover:tracking-[0.16em]">
-                  Military Helper
-                </span>
+            <Link href="/home" className="group relative flex items-center space-x-2 overflow-hidden px-4 py-2 hover:bg-[#0f1c16] transition-all duration-300">
+              {/* Scanline */}
+              <div className="absolute left-0 right-0 h-0.5 bg-[#caa35d]/50 shadow-[0_0_10px_#caa35d] animate-scan-vertical opacity-50 z-20 pointer-events-none" />
+
+              {/* Targeting Corners */}
+              <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-[#caa35d] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-[#caa35d] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-[#caa35d] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-[#caa35d] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+              <div className="relative z-10 flex items-center space-x-3">
+                {/* Logo with pulse */}
+                <div className="relative">
+                  <div className="absolute inset-0 bg-[#caa35d]/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 animate-pulse transition-opacity" />
+                  <Logo className="w-10 h-10 shrink-0 drop-shadow-[0_0_5px_rgba(202,163,93,0.5)] transition-all duration-300 group-hover:scale-105 group-hover:drop-shadow-[0_0_15px_rgba(202,163,93,0.8)]" />
+                </div>
+
+                {/* Glitch Text Wrapper */}
+                <div className="relative font-bold tracking-[0.14em] uppercase text-xl text-[#f1df9c]">
+                  <span className="relative z-10 group-hover:text-[#caa35d] transition-colors duration-300">Military Helper</span>
+                  {/* Glitch Layers (Visible on Hover) */}
+                  <span className="absolute top-0 left-0 -ml-0.5 translate-x-[2px] text-red-500 opacity-0 group-hover:opacity-70 group-hover:animate-glitch-1" aria-hidden="true">Military Helper</span>
+                  <span className="absolute top-0 left-0 -ml-0.5 -translate-x-[2px] text-cyan-500 opacity-0 group-hover:opacity-70 group-hover:animate-glitch-1" style={{ animationDirection: 'reverse' }} aria-hidden="true">Military Helper</span>
+                </div>
               </div>
             </Link>
             {isAdmin && (
