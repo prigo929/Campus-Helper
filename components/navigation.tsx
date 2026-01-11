@@ -212,7 +212,7 @@ export function Navigation() {
             {isAuthed ? (
               <>
                 <NotificationsDropdown />
-                <Link href="/messages" aria-label="Messages" className="hidden sm:inline-flex">                  <Button
+                <Link href="/messages" aria-label="Messages" className="hidden lg:inline-flex">                  <Button
                   variant="ghost"
                   size="icon"
                   className="h-10 w-10 text-[#f1df9c] hover:text-[#caa35d] hover:bg-[#1a2217]"
@@ -220,7 +220,7 @@ export function Navigation() {
                   <MessageSquare className="w-5 h-5" />
                 </Button>
                 </Link>
-                <Link href="/profile">
+                <Link href="/profile" className="hidden lg:inline-flex">
                   <Button
                     variant="ghost"
                     className="text-[#f1df9c] hover:text-[#caa35d] hover:bg-[#1a2217] flex items-center gap-2 h-10 px-2"
@@ -230,12 +230,12 @@ export function Navigation() {
                         {initials}
                       </AvatarFallback>
                     </Avatar>
-                    <span className="hidden sm:inline">{displayName || 'Profile'}</span>
+                    <span className="hidden xl:inline">{displayName || 'Profile'}</span>
                   </Button>
                 </Link>
                 <Button
                   variant="outline"
-                  className="border-[#caa35d]/40 bg-white/5 text-[#f1df9c] hover:bg-[#caa35d] hover:text-[#0f1c16] hidden sm:inline-flex"
+                  className="border-[#caa35d]/40 bg-white/5 text-[#f1df9c] hover:bg-[#caa35d] hover:text-[#0f1c16] hidden lg:inline-flex"
                   onClick={handleSignOut}
                   disabled={loading}
                 >
@@ -244,13 +244,13 @@ export function Navigation() {
               </>
             ) : (
               <>
-                <Link href="/profile">
+                <Link href="/profile" className="hidden lg:inline-flex">
                   <Button variant="ghost" className="text-[#f1df9c] hover:text-[#caa35d] hover:bg-[#1a2217]">
                     <User className="w-4 h-4 mr-2" />
-                    <span className="hidden sm:inline">Profile</span>
+                    <span>Profile</span>
                   </Button>
                 </Link>
-                <Link href="/sign-in">
+                <Link href="/sign-in" className="hidden lg:inline-flex">
                   <Button className="bg-[#caa35d] text-[#0f1c16] hover:bg-[#a57c2c] font-semibold">
                     Sign In
                   </Button>
@@ -301,43 +301,57 @@ export function Navigation() {
                   AI
                 </Button>
               </Link>
-              {isAuthed && (
-                <Link href="/messages" onClick={() => setMobileOpen(false)}>
-                  <Button variant="ghost" className="w-full justify-center bg-[#0f1c16]/70 text-[#f1df9c] border border-[#caa35d]/25 hover:bg-[#1a2217]">
-                    <MessageSquare className="w-4 h-4 mr-2" />
-                    Messages
-                  </Button>
-                </Link>
-              )}
-              {isAdmin && (
-                <Link href="/admin/reports" onClick={() => setMobileOpen(false)}>
-                  <Button className="w-full justify-center bg-[#caa35d] text-[#0f1c16]">
-                    <Shield className="w-4 h-4 mr-2" />
-                    Admin
-                  </Button>
-                </Link>
-              )}
               {isAuthed ? (
-                <Button
-                  className="w-full justify-center bg-[#caa35d] text-[#0f1c16]"
-                  onClick={() => {
-                    setMobileOpen(false);
-                    handleSignOut();
-                  }}
-                  disabled={loading}
-                >
-                  {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogOut className="w-4 h-4 mr-2" />}
-                  Sign out
-                </Button>
+                <>
+                  <Link href="/profile" onClick={() => setMobileOpen(false)}>
+                    <Button variant="ghost" className="w-full justify-center bg-[#0f1c16]/70 text-[#f1df9c] border border-[#caa35d]/25 hover:bg-[#1a2217]">
+                      <User className="w-4 h-4 mr-2" />
+                      Profile
+                    </Button>
+                  </Link>
+                  <Link href="/messages" onClick={() => setMobileOpen(false)}>
+                    <Button variant="ghost" className="w-full justify-center bg-[#0f1c16]/70 text-[#f1df9c] border border-[#caa35d]/25 hover:bg-[#1a2217]">
+                      <MessageSquare className="w-4 h-4 mr-2" />
+                      Messages
+                    </Button>
+                  </Link>
+                  {isAdmin && (
+                    <Link href="/admin/reports" onClick={() => setMobileOpen(false)}>
+                      <Button className="w-full justify-center bg-[#caa35d] text-[#0f1c16]">
+                        <Shield className="w-4 h-4 mr-2" />
+                        Admin
+                      </Button>
+                    </Link>
+                  )}
+                  <Button
+                    className="w-full justify-center bg-[#caa35d]/10 text-[#f1df9c] border border-[#caa35d]/40 hover:bg-[#caa35d] hover:text-[#0f1c16]"
+                    onClick={() => {
+                      setMobileOpen(false);
+                      handleSignOut();
+                    }}
+                    disabled={loading}
+                  >
+                    {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogOut className="w-4 h-4 mr-2" />}
+                    Sign out
+                  </Button>
+                </>
               ) : (
-                <Link href="/sign-in" onClick={() => setMobileOpen(false)}>
-                  <Button className="w-full justify-center bg-[#caa35d] text-[#0f1c16]">Sign In</Button>
-                </Link>
+                <>
+                  <Link href="/profile" onClick={() => setMobileOpen(false)}>
+                    <Button variant="ghost" className="w-full justify-center bg-[#0f1c16]/70 text-[#f1df9c] border border-[#caa35d]/25 hover:bg-[#1a2217]">
+                      <User className="w-4 h-4 mr-2" />
+                      Profile
+                    </Button>
+                  </Link>
+                  <Link href="/sign-in" onClick={() => setMobileOpen(false)}>
+                    <Button className="w-full justify-center bg-[#caa35d] text-[#0f1c16]">Sign In</Button>
+                  </Link>
+                </>
               )}
             </div>
           </div>
         )}
       </div>
-    </nav>
+    </nav >
   );
 }

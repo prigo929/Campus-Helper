@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Music2, Pause, Play, SkipForward, Volume2, VolumeX } from 'lucide-react';
 
 const PLAYLIST = [
-  { id: 'Ann_XMs-gfc', title: 'Macarena (Slowed) | Military Edition' },
+  { id: 'Ann_XMs-gfc', title: 'Macarena (Slowed) | Military Edition', mobileTitle: 'Macarena (Slowed)' },
   { id: 'ojtYXmyLcyI', title: 'Government Hooker' },
 ];
 
@@ -123,14 +123,16 @@ export function BackgroundAudio() {
     const player = playerRef.current;
     if (!player || !ready) return;
 
-    // Check if player has loadVideoById method (it should)
+    // loadVideoById automatically plays by default, but we can be explicit
     if (player.loadVideoById) {
       player.loadVideoById(PLAYLIST[currentIndex].id);
-      if (playing) { // Keep playing state
-        player.playVideo();
+      // We also verify that we want to be in a playing state
+      if (playing) {
+        // give it a tiny tick to ensure load doesn't swallow the play command if logic was async
+        setTimeout(() => player.playVideo(), 100);
       }
     }
-  }, [currentIndex, ready]); // Depend on ready so if it becomes ready late, we are good.
+  }, [currentIndex, ready]);
 
   // Sync controls
   useEffect(() => {
@@ -180,7 +182,10 @@ export function BackgroundAudio() {
         <div className="leading-tight">
           <p className="text-xs uppercase tracking-[0.14em] text-[#caa35d]">Now looping</p>
           <div className="flex items-center gap-2">
-            <p className="text-sm font-semibold whitespace-nowrap">{PLAYLIST[currentIndex].title}</p>
+            <p className="text-sm font-semibold whitespace-nowrap">
+              <span className="md:hidden">{PLAYLIST[currentIndex].mobileTitle || PLAYLIST[currentIndex].title}</span>
+              <span className="hidden md:inline">{PLAYLIST[currentIndex].title}</span>
+            </p>
           </div>
         </div>
       </div>
