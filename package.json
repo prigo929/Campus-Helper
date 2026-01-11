@@ -9,6 +9,10 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "typecheck": "tsc --noEmit"
   },
+  "overrides": {
+    "react": "$react",
+    "react-dom": "$react-dom"
+  },
   "dependencies": {
     "@ai-sdk/groq": "^2.0.32",
     "@ai-sdk/openai": "^2.0.76",
