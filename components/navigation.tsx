@@ -129,15 +129,17 @@ export function Navigation() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         <div className="flex items-center gap-2 py-3">
           <div className="flex items-center space-x-2 flex-shrink-0">
-            <Link href="/home" className="group relative flex items-center space-x-2 overflow-hidden px-4 py-2 hover:bg-[#0f1c16] transition-all duration-300">
-              {/* Scanline */}
-              <div className="absolute left-0 right-0 h-0.5 bg-[#caa35d]/50 shadow-[0_0_10px_#caa35d] animate-scan-vertical opacity-50 z-20 pointer-events-none" />
+            <Link href="/home" className="group relative flex items-center space-x-2 px-4 py-2 hover:bg-[#0f1c16] transition-all duration-300">
+              {/* Scanline Container */}
+              <div className="absolute inset-px overflow-hidden pointer-events-none">
+                <div className="absolute left-0 right-0 h-0.5 bg-[#caa35d]/50 shadow-[0_0_10px_#caa35d] animate-scan-vertical opacity-50 z-0" />
+              </div>
 
               {/* Targeting Corners */}
-              <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-[#caa35d] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-[#caa35d] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-[#caa35d] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-[#caa35d] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-[#caa35d] opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50" />
+              <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-[#caa35d] opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50" />
+              <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-[#caa35d] opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50" />
+              <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-[#caa35d] opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50" />
 
               <div className="relative z-10 flex items-center space-x-3">
                 {/* Logo with pulse */}
