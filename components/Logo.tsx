@@ -40,34 +40,6 @@ const Logo = ({ className = 'w-10 h-10' }: LogoProps) => {
             stroke="rgba(255,255,255,0.26)"
             strokeWidth="2"
           />
-          <circle
-            cx="60"
-            cy="60"
-            r="52"
-            fill="none"
-            stroke="url(#mhRing)"
-            strokeWidth="6"
-            strokeLinecap="round"
-            className="animate-[spin_10s_linear_infinite]"
-          />
-          <circle
-            cx="60"
-            cy="60"
-            r="48"
-            fill="none"
-            stroke="rgba(255,255,255,0.2)"
-            strokeWidth="2"
-            strokeDasharray="6 12"
-            strokeLinecap="round"
-            className="animate-[spin_6s_linear_infinite]"
-          />
-          <circle
-            cx="60"
-            cy="60"
-            r="36"
-            fill="rgba(255,255,255,0.16)"
-            className="animate-ping"
-          />
           <circle cx="60" cy="60" r="42" fill="rgba(11,15,24,0.38)" stroke="rgba(255,255,255,0.32)" strokeWidth="1.5" />
           <text
             x="60"
